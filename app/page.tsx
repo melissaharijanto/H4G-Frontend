@@ -2,7 +2,7 @@ const Login = () => {
     return (
         <div className="w-screen min-h-screen bg-white lg:bg-off-white flex lg:flex-row flex-col">
             <div className="w-full lg:w-1/2 lg:h-screen bg-[url('/gradient.png')] bg-cover bg-no-repeat bg-center flex justify-center items-center">
-                <p className="font-inter font-bold tracking-tight text-4xl lg:text-6xl p-4">
+                <p className="font-inter font-bold tracking-tight text-4xl lg:text-6xl p-8">
                     Welcome to <br />
                     Muhammadiyah
                     <br />
