@@ -16,9 +16,9 @@ const SearchIcon = ({
             <path
                 d="M34.125 34.625L27.0562 27.5562M30.875 18.375C30.875 25.5547 25.0547 31.375 17.875 31.375C10.6953 31.375 4.875 25.5547 4.875 18.375C4.875 11.1953 10.6953 5.375 17.875 5.375C25.0547 5.375 30.875 11.1953 30.875 18.375Z"
                 className={`${strokeColor} ${className}`}
-                stroke-width="4"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
             />
         </svg>
     );
