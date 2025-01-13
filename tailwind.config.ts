@@ -11,7 +11,21 @@ export default {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+        "off-white": "#FAFAFA",
+        "white": "#FFFFFF",
+        "blue": "#2C3691",
+        "red": "#D2422A",
+        "green": "#3B9983",
+        "yellow": "#F3AB46",
+        "grey": "#888888",
+        "input": "#f2f2f2",
       },
+      fontFamily: {
+        inter: "Inter, sans-serif",
+      },
+      boxShadow: {
+        "custom": "0 0 7px 0px rgba(0,0,0,0.25)",
+      }
     },
   },
   plugins: [],
