@@ -19,6 +19,7 @@ export default {
         "yellow": "#F3AB46",
         "grey": "#888888",
         "input": "#f2f2f2",
+        "dark-green": "#005440",
       },
       fontFamily: {
         inter: "Inter, sans-serif",
