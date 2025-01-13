@@ -1,4 +1,9 @@
+'use client';
+import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+
 const Login = () => {
+    const user = useAppSelector((state) => state.user);
+
     return (
         <div className="w-screen min-h-screen bg-white lg:bg-off-white flex lg:flex-row flex-col">
             <div className="w-full lg:w-1/2 lg:h-screen bg-[url('/gradient.png')] bg-cover bg-no-repeat bg-center flex justify-center items-center">
@@ -8,6 +13,7 @@ const Login = () => {
                     <br />
                     Welfare Home&apos;s
                     <br /> Minimart!
+                    {user.name}
                 </p>
             </div>
             <div className="w-full lg:w-1/2 flex items-center justify-center">
