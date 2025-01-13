@@ -21,7 +21,7 @@ const Login = () => {
     return (
         <div className="w-screen min-h-screen bg-white lg:bg-off-white flex lg:flex-row flex-col">
             <div className="w-full lg:w-1/2 lg:h-screen bg-[url('/gradient.png')] bg-cover bg-no-repeat bg-center flex justify-center items-center">
-                <p className="font-inter font-bold tracking-tight text-4xl lg:text-6xl p-8">
+                <p className="font-inter font-bold tracking-tight text-4xl lg:text-6xl p-8 font-white">
                     Welcome to <br />
                     Muhammadiyah
                     <br />
@@ -61,7 +61,7 @@ const Login = () => {
                                 className="w-full bg-input px-5 py-2.5 rounded-xl text-black"></input>
                         </div>
                     </div>
-                    <button className="bg-red rounded-xl px-5 py-2.5 font-semibold font-white text-sm">
+                    <button className="bg-red rounded-xl px-5 py-2.5 font-semibold font-white text-sm font-white">
                         LOGIN
                     </button>
                     <p className="text-blue font-medium text-center text-sm">
