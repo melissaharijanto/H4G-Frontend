@@ -6,12 +6,12 @@ const Login = () => {
                     Welcome to <br />
                     Muhammadiyah
                     <br />
-                    Welfare Home's
+                    Welfare Home&apos;s
                     <br /> Minimart!
                 </p>
             </div>
             <div className="w-full lg:w-1/2 flex items-center justify-center">
-                <div className="bg-white shadow-custom font-inter flex flex-col w-full m-4 lg:m-20 p-12 rounded-2xl gap-y-8 flex items-center justify-center">
+                <div className="bg-white shadow-custom font-inter flex flex-col w-full m-4 lg:m-28 p-12 rounded-2xl gap-y-8 flex items-center justify-center">
                     <div className="gap-y-4 flex flex-col w-full justify-center items-center">
                         <img
                             src="/mwh-logo.png"
