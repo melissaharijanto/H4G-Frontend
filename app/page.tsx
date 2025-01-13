@@ -3,6 +3,7 @@
 // import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
 
 const Login = () => {
+    // HOW TO USE REDUX (EXAMPLE)
     // const user = useAppSelector((state) => state.user);
     // const dispatch = useAppDispatch();
     // const store = useAppStore();
