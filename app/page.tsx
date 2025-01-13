@@ -36,7 +36,7 @@ const Login = () => {
                             alt="Welfare Home Logo"
                             className="w-52"
                         />
-                        <p className="text-5xl font-black text-blue text-center">
+                        <p className="text-3xl lg:text-5xl font-black text-blue text-center">
                             Welcome Back
                         </p>
                     </div>
