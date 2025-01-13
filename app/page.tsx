@@ -1,8 +1,21 @@
 'use client';
-import { useAppDispatch, useAppSelector } from '@/lib/hooks';
+// import { setUser } from '@/lib/features/userSlice';
+// import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
 
 const Login = () => {
-    const user = useAppSelector((state) => state.user);
+    // const user = useAppSelector((state) => state.user);
+    // const dispatch = useAppDispatch();
+    // const store = useAppStore();
+    // store.dispatch(
+    //     setUser({
+    //         uid: '123',
+    //         name: 'John Doe',
+    //         cat: 'ADMIN',
+    //         email: 'john.doe@example.com',
+    //         password: 'password123',
+    //         credit: 50.0,
+    //     })
+    // );
 
     return (
         <div className="w-screen min-h-screen bg-white lg:bg-off-white flex lg:flex-row flex-col">
@@ -13,7 +26,6 @@ const Login = () => {
                     <br />
                     Welfare Home&apos;s
                     <br /> Minimart!
-                    {user.name}
                 </p>
             </div>
             <div className="w-full lg:w-1/2 flex items-center justify-center">
