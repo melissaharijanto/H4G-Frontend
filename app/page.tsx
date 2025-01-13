@@ -1,8 +1,8 @@
 const Login = () => {
     return (
-        <div className="w-screen min-h-screen bg-off-white flex">
-            <div className="w-1/2 h-screen bg-[url('/gradient.png')] bg-cover bg-no-repeat bg-center flex justify-center items-center">
-                <p className="font-inter font-bold tracking-tight text-6xl">
+        <div className="w-screen min-h-screen bg-off-white flex lg:flex-row flex-col">
+            <div className="w-full lg:w-1/2 lg:h-screen bg-[url('/gradient.png')] bg-cover bg-no-repeat bg-center flex justify-center items-center">
+                <p className="font-inter font-bold tracking-tight text-4xl lg:text-6xl p-4">
                     Welcome to <br />
                     Muhammadiyah
                     <br />
@@ -10,8 +10,8 @@ const Login = () => {
                     <br /> Minimart!
                 </p>
             </div>
-            <div className="w-1/2 flex items-center justify-center">
-                <div className="bg-white shadow-custom font-inter flex flex-col w-full m-20 p-12 rounded-2xl gap-y-8 flex items-center justify-center">
+            <div className="w-full lg:w-1/2 flex items-center justify-center">
+                <div className="bg-white shadow-custom font-inter flex flex-col w-full m-4 lg:m-20 p-12 rounded-2xl gap-y-8 flex items-center justify-center">
                     <div className="gap-y-4 flex flex-col w-full justify-center items-center">
                         <img
                             src="/mwh-logo.png"
