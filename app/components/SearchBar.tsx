@@ -79,7 +79,7 @@ const SearchBar = ({
                         <a
                             href=""
                             key={index}
-                            className="py-2 px-4 hover:bg-input flex gap-x-2 items-center">
+                            className="py-2 px-4 hover:bg-grey flex gap-x-2 items-center">
                             <SearchIcon strokeColor="stroke-blue" width="w-7" />
                             <p className="font-bold text-black">{result}</p>
                         </a>
