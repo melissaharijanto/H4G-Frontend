@@ -3,6 +3,7 @@
 import { useAppSelector } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
 import Category from '../components/CategoryLabel';
+import ProductCard from '../components/ProductCard';
 
 const Home = () => {
     const user = useAppSelector((state) => state.user);
@@ -12,6 +13,19 @@ const Home = () => {
         'Bags',
         'Clothes',
         'Others',
+    ];
+
+    const dummyProducts = [
+        'NIKE shoes 1',
+        'NIKE shoes 2',
+        'NIKE shoes 3',
+        'NIKE shoes 4',
+        'Adidas sneakers 1',
+        'Adidas sneakers 2',
+        'Puma shoes 1',
+        'Puma shoes 2',
+        'Reebok running shoes 1',
+        'Reebok running shoes 2',
     ];
     return (
         <PageWithNavbar>
@@ -34,6 +48,26 @@ const Home = () => {
                         {dummyCategories.map((cat) => {
                             return <Category name={cat} key={cat} />;
                         })}
+                    </div>
+                </div>
+                {/*Category*/}
+                <div className="flex flex-col gap-y-4">
+                    <p className="font-bold text-blue text-3xl">Shoes</p>
+                    <div className="w-full grid grid-cols-6 gap-x-4">
+                        {dummyProducts.slice(0, 6).map((prod) => (
+                            <ProductCard key={prod} />
+                        ))}
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-y-4">
+                    <p className="font-bold text-blue text-3xl">
+                        Food and Drinks
+                    </p>
+                    <div className="w-full grid grid-cols-6 gap-x-4">
+                        {dummyProducts.slice(0, 6).map((prod) => (
+                            <ProductCard key={prod} />
+                        ))}
                     </div>
                 </div>
             </div>

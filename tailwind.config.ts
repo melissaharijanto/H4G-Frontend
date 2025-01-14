@@ -18,6 +18,7 @@ export default {
         "green": "#3B9983",
         "yellow": "#F3AB46",
         "grey": "#DDDDDD",
+        "dark-grey": "#888888",
         "input": "#f2f2f2",
         "dark-green": "#005440",
       },
