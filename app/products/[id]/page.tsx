@@ -1,6 +1,7 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import { API_URL } from '@/app/constants';
+import { getItemById } from '@/lib/backend/items';
 import { useAppSelector } from '@/lib/hooks';
 import { Item } from '@/lib/types/Item';
 import { useParams } from 'next/navigation';
@@ -83,15 +84,10 @@ const ProductPage = () => {
     };
 
     useEffect(() => {
-        fetch(`${API_URL}/items/${id}`, {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        })
-            .then((resp) => resp.json())
-            .then((data) => {
-                setItem(data.item);
-            });
+        getItemById(session.jwt, id).then((data) => {
+            console.log(data);
+            setItem(data.item);
+        });
     }, []);
 
     useEffect(() => {
@@ -132,7 +128,7 @@ const ProductPage = () => {
                     <div className="gap-y-2 flex flex-col">
                         <p className="font-semibold text-xl">Quantity</p>
                         <div className="w-full text-lg">
-                            <div className="flex gap-x-4">
+                            <div className="flex gap-x-4 items-center">
                                 <div className="flex border-2 border-dark-grey rounded-xl w-fit">
                                     <div className=" border-r-2 border-dark-grey py-2 px-4">
                                         <button
