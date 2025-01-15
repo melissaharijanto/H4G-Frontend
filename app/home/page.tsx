@@ -2,7 +2,6 @@
 
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
-import Category from '../components/CategoryLabel';
 import ProductCard from '../components/ProductCard';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
@@ -10,6 +9,7 @@ import { API_URL } from '../constants';
 import { setUser } from '@/lib/features/userSlice';
 import { User } from '@/lib/types/User';
 import { Item } from '@/lib/types/Item';
+import { getUser } from '@/lib/backend/users';
 
 const Home = () => {
     const userInState = useAppSelector((state) => state.user);
@@ -17,32 +17,33 @@ const Home = () => {
     const store = useAppStore();
     const [user, setUserInPage] = useState<User>();
     const [items, setItems] = useState<Item[]>([]);
+    const uid = jwtDecode(session.jwt).sub;
 
-    const getUser = () => {
-        const uid = jwtDecode(session.jwt).sub;
-        fetch(`${API_URL}/users/${uid}`, {
-            headers: {
-                Authorization: `Bearer ${session.jwt}`,
-            },
-            method: 'GET',
-        })
-            .then((resp) => resp.json())
-            .then((data) => {
-                console.log(data);
-                const loadedUser: User = {
-                    uid: data.user.uid,
-                    name: data.user.name,
-                    cat: data.user.cat,
-                    email: data.user.email,
-                    credit: data.user.credit,
-                    is_active: true,
-                    transactions: data.transactions,
-                    tasks: data.tasks,
-                };
-                store.dispatch(setUser(loadedUser));
-                setUserInPage(loadedUser);
-            });
-    };
+    // const getUser = () => {
+    //     const uid = jwtDecode(session.jwt).sub;
+    //     fetch(`${API_URL}/users/${uid}`, {
+    //         headers: {
+    //             Authorization: `Bearer ${session.jwt}`,
+    //         },
+    //         method: 'GET',
+    //     })
+    //         .then((resp) => resp.json())
+    //         .then((data) => {
+    //             console.log(data);
+    //             const loadedUser: User = {
+    //                 uid: data.user.uid,
+    //                 name: data.user.name,
+    //                 cat: data.user.cat,
+    //                 email: data.user.email,
+    //                 credit: data.user.credit,
+    //                 is_active: true,
+    //                 transactions: data.transactions,
+    //                 tasks: data.tasks,
+    //             };
+    //             store.dispatch(setUser(loadedUser));
+    //             setUserInPage(loadedUser);
+    //         });
+    // };
 
     const getItems = () => {
         fetch(`${API_URL}/items/all`, {
@@ -58,9 +59,14 @@ const Home = () => {
                 setItems(data.items);
             });
     };
+
     useEffect(() => {
-        if (userInState.uid.trim().length == 0) {
-            getUser();
+        console.log(userInState);
+        if (userInState.user.uid.trim().length == 0) {
+            getUser(session.jwt, uid!).then((data) => {
+                store.dispatch(setUser(data));
+                setUserInPage(data);
+            });
         } else {
             setUserInPage(userInState);
         }
@@ -72,12 +78,12 @@ const Home = () => {
             <div className="w-full p-8 font-inter flex flex-col gap-y-8">
                 <div className="w-full flex justify-between items-center">
                     <p className="text-red font-semibold text-3xl">
-                        Welcome back, {user?.name}!
+                        Welcome back, {user?.user.name}!
                     </p>
                     <p className="text-blue font-semibold">
                         You currently have{' '}
-                        <span className="font-black">{user?.credit}</span>{' '}
-                        {user?.credit == 1 ? 'credit' : 'credits'}.
+                        <span className="font-black">{user?.user.credit}</span>{' '}
+                        {user?.user.credit == 1 ? 'credit' : 'credits'}.
                     </p>
                 </div>
                 <div className="w-full bg-gradient-to-b from-dark-green to-green rounded-xl p-5 flex flex-col gap-y-4">

@@ -5,6 +5,7 @@ import { API_URL } from './constants';
 import { setJwt } from '@/lib/features/sessionSlice';
 import { useAppStore } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
+import { clearUser } from '@/lib/features/userSlice';
 
 const Login = () => {
     const store = useAppStore();
@@ -105,6 +106,13 @@ const Login = () => {
                         create an account or reset your password.
                     </p>
                 </div>
+            </div>
+            <div>
+                <button
+                    onClick={() => store.dispatch(clearUser())}
+                    className="text-black">
+                    click me
+                </button>
             </div>
         </div>
     );

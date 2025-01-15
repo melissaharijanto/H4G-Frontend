@@ -43,7 +43,7 @@ const ProductPage = () => {
                 body: JSON.stringify({
                     id: item!.id,
                     quantity: count,
-                    uid: user.uid,
+                    uid: user.user.uid,
                 }),
             })
                 .then((resp) => resp.json())
@@ -74,7 +74,7 @@ const ProductPage = () => {
                 body: JSON.stringify({
                     id: item!.id,
                     quantity: count,
-                    uid: user.uid,
+                    uid: user.user.uid,
                 }),
             })
                 .then((resp) => resp.json())
@@ -119,8 +119,8 @@ const ProductPage = () => {
                         <p className="font-semibold text-xl">{item?.name}</p>
                         <p className="font-black text-4xl">20 credits</p>
                         <p className="text-md text-dark-grey">
-                            You currently have {user.credit}{' '}
-                            {user.credit == 1 ? 'credit' : 'credits'}.
+                            You currently have {user.user.credit}{' '}
+                            {user.user.credit == 1 ? 'credit' : 'credits'}.
                         </p>
                     </div>
                     <div className="gap-y-2 flex flex-col">
