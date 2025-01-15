@@ -5,7 +5,6 @@ import { API_URL } from './constants';
 import { setJwt } from '@/lib/features/sessionSlice';
 import { useAppStore } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
-import { clearUser } from '@/lib/features/userSlice';
 
 const Login = () => {
     const store = useAppStore();
