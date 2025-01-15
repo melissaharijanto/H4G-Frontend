@@ -1,33 +1,33 @@
 import { ItemRequest } from '@/lib/types/ItemRequest';
-import { call, getUid } from '@/lib/backend/common';
+import { call } from '@/lib/backend/common';
 import { Resp } from '@/lib/types/Resp';
 
-export async function getAllItemRequests(): Promise<ItemRequest[]> {
-    return call<ItemRequest[]>(`/itemrequests/all`, "GET");
+export async function getAllItemRequests(jwt: string): Promise<ItemRequest[]> {
+    return call<ItemRequest[]>(`/itemrequests/all`, "GET", jwt);
 }
 
-export async function addItemRequest(description: string): Promise<{success: boolean, id: string, message: string}> {
+export async function addItemRequest(jwt: string, requested_by: string, description: string): Promise<{success: boolean, id: string, message: string}> {
     const body = {
         "itemrequest": {
-            "requested_by": getUid(),
+            "requested_by": requested_by,
             "description": description
         }
     }
-    return call<{success: boolean, id: string, message: string}>(`/itemrequests/create`, "POST", body);
+    return call<{success: boolean, id: string, message: string}>(`/itemrequests/create`, "POST", jwt, body);
 }
 
-export async function updateItemRequest(id: string, description: string): Promise<Resp> {
+export async function updateItemRequest(jwt: string, id: string, description: string): Promise<Resp> {
     const body = {
         "itemrequest": {
             "id": id,
             "description": description
         }
     }
-    return call<Resp>(`/itemrequests/update`, "PATCH", body);
+    return call<Resp>(`/itemrequests/update`, "PATCH", jwt, body);
 }
 
-export async function deleteItemRequest(id: string): Promise<Resp> {
-    return call<Resp>(`/itemrequests/${id}/delete`, "DELETE");
+export async function deleteItemRequest(jwt: string, id: string): Promise<Resp> {
+    return call<Resp>(`/itemrequests/${id}/delete`, "DELETE", jwt);
 }
 
 

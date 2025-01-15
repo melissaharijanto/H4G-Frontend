@@ -2,20 +2,7 @@ import { API_URL } from "@/app/constants";
 import { useAppSelector } from '@/lib/hooks';
 import { jwtDecode } from 'jwt-decode';
 
-export function getJwt(): string{
-    const session = useAppSelector((state) => state.session);
-    const jwt = session.jwt;
-    return jwt;
-}
-
-export function getUid(): string | undefined {
-    const uid = jwtDecode(getJwt()).sub;
-    return uid;
-}
-
-export async function call<T>(path: string, method: string, body?: any): Promise<T> {
-    const jwt = getJwt()
-
+export async function call<T>(path: string, method: string, jwt: string, body?: any): Promise<T> {
     if (body) {
         console.log(JSON.stringify(body))
     }
