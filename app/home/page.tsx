@@ -10,6 +10,7 @@ import { setUser } from '@/lib/features/userSlice';
 import { User } from '@/lib/types/User';
 import { Item } from '@/lib/types/Item';
 import { getUser } from '@/lib/backend/users';
+import { getAllItems } from '@/lib/backend/items';
 
 const Home = () => {
     const userInState = useAppSelector((state) => state.user);
@@ -18,20 +19,6 @@ const Home = () => {
     const [user, setUserInPage] = useState<User>();
     const [items, setItems] = useState<Item[]>([]);
 
-    const getItems = () => {
-        fetch(`${API_URL}/items/all`, {
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${session.jwt}`,
-            },
-            method: 'GET',
-        })
-            .then((resp) => resp.json())
-            .then((data) => {
-                console.log(data.items);
-                setItems(data.items);
-            });
-    };
     useEffect(() => {
         if (userInState.user.uid.trim().length == 0) {
             const uid = jwtDecode(session.jwt).sub;
@@ -42,7 +29,10 @@ const Home = () => {
         } else {
             setUserInPage(userInState);
         }
-        getItems();
+
+        getAllItems(session.jwt).then((data) => {
+            setItems(data.items);
+        });
     }, []);
 
     return (
