@@ -107,13 +107,6 @@ const Login = () => {
                     </p>
                 </div>
             </div>
-            <div>
-                <button
-                    onClick={() => store.dispatch(clearUser())}
-                    className="text-black">
-                    click me
-                </button>
-            </div>
         </div>
     );
 };
