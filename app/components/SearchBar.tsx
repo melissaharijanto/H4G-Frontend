@@ -1,6 +1,9 @@
 'use client';
+import { getAllItems } from '@/lib/backend/items';
 import SearchIcon from './icons/SearchIcon';
 import { useEffect, useRef, useState } from 'react';
+import { useAppSelector } from '@/lib/hooks';
+import { Item } from '@/lib/types/Item';
 
 const SearchBar = ({
     setOpenSearchBar,
@@ -8,14 +11,16 @@ const SearchBar = ({
     setOpenSearchBar: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
     const [query, setQuery] = useState('');
-    const [results, setResults] = useState<string[]>([]); // keep results here
+    const [results, setResults] = useState<Item[]>([]); // keep results here
+    const [items, setItems] = useState<Item[]>();
     const searchRef = useRef<HTMLDivElement | null>(null);
-    const dummyQuery = [
-        'NIKE shoes 1',
-        'NIKE shoes 2',
-        'NIKE shoes 3',
-        'NIKE shoes 4',
-    ];
+    const session = useAppSelector((state) => state.session);
+
+    useEffect(() => {
+        getAllItems(session.jwt).then((data) => {
+            setItems(data.items);
+        });
+    });
 
     // Handle clicks outside the search input or results
     useEffect(() => {
@@ -41,8 +46,8 @@ const SearchBar = ({
         if (query.trim() === '') {
             setResults([]); // Clear results if query is empty
         } else {
-            const filteredResults = dummyQuery.filter(
-                (item) => item.toLowerCase().includes(query.toLowerCase()) // Case insensitive search
+            const filteredResults = items!.filter(
+                (item) => item.name.toLowerCase().includes(query.toLowerCase()) // Case insensitive search
             );
             setResults(filteredResults);
         }
@@ -77,11 +82,13 @@ const SearchBar = ({
                 <div className="absolute top-full left-0 right-0 bg-white shadow-custom mt-2 py-2 rounded-xl">
                     {results.map((result, index) => (
                         <a
-                            href=""
+                            href={`/products/${result.id}`}
                             key={index}
                             className="py-2 px-4 hover:bg-grey flex gap-x-2 items-center">
                             <SearchIcon strokeColor="stroke-blue" width="w-7" />
-                            <p className="font-bold text-black">{result}</p>
+                            <p className="font-bold text-black">
+                                {result.name}
+                            </p>
                         </a>
                     ))}
                 </div>
