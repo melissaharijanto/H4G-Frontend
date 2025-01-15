@@ -3,10 +3,11 @@ export interface Task {
     name: string;
     created_by: string;
     reward: number;
-    deadline: Date;
+    start_time: Date;
+    end_time: Date;
+    recurrence_interval: number;
     user_limit: number;
     description: string;
     require_review: boolean;
     require_proof: boolean;
-    is_recurring: boolean;
 }
