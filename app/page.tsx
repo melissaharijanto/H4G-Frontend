@@ -6,9 +6,6 @@ import { setJwt } from '@/lib/features/sessionSlice';
 import { useAppStore } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
 
-// import { setUser } from '@/lib/features/userSlice';
-// import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
-
 const Login = () => {
     const store = useAppStore();
     const router = useRouter();

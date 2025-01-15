@@ -7,7 +7,9 @@ const initialState : User = {
     cat: '',
     email: '',
     credit: 0.0,
-    is_active: true
+    is_active: true,
+    transactions: [],
+    tasks: [],
 };
 
 const userSlice = createSlice({
