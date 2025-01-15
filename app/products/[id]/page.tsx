@@ -1,6 +1,7 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import { API_URL } from '@/app/constants';
+import { useAppSelector } from '@/lib/hooks';
 import { Item } from '@/lib/types/Item';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -10,6 +11,11 @@ const ProductPage = () => {
     const [item, setItem] = useState<Item>();
     const [disablePlusButton, setDisablePlusButton] = useState<boolean>(false);
     const [disableMinusButton, setDisableMinusButton] = useState<boolean>(true);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+    const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+    const session = useAppSelector((state) => state.session);
+    const user = useAppSelector((state) => state.user);
 
     const { id } = useParams();
 
@@ -19,6 +25,61 @@ const ProductPage = () => {
 
     const decrementCount = () => {
         setCount((count) => count - 1);
+    };
+
+    const buyItem = () => {
+        setSuccessMessage(null);
+        setErrorMessage(null);
+        if (count <= 0) {
+            setErrorMessage('Please buy or preorder at least 1 product.');
+            return;
+        } else {
+            fetch(`${API_URL}/items/buy`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.jwt}`,
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    id: item!.id,
+                    quantity: count,
+                    uid: user.uid,
+                }),
+            })
+                .then((resp) => resp.json())
+                .then((data) => {
+                    if (!data.success) {
+                        setErrorMessage(data.message);
+                        return;
+                    } else {
+                        setSuccessMessage('Transaction successful!');
+                    }
+                });
+        }
+    };
+
+    const preorderItem = () => {
+        setSuccessMessage(null);
+        setErrorMessage(null);
+        if (count <= 0) {
+            setErrorMessage('Please buy or preorder at least 1 product.');
+            return;
+        } else {
+            fetch(`${API_URL}/items/preorder`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.jwt}`,
+                },
+                method: 'POST',
+                body: JSON.stringify({
+                    id: item!.id,
+                    quantity: count,
+                    uid: user.uid,
+                }),
+            })
+                .then((resp) => resp.json())
+                .then((data) => console.log(data));
+        }
     };
 
     useEffect(() => {
@@ -38,7 +99,7 @@ const ProductPage = () => {
         setDisablePlusButton(false);
         if (count <= 0) {
             setDisableMinusButton(true);
-        } else if (count >= (item?.stock || 100)) {
+        } else if (count >= (item?.stock || 100) && item!.stock > 0) {
             setDisablePlusButton(true);
         }
     }, [count]);
@@ -57,6 +118,10 @@ const ProductPage = () => {
                     <div className="gap-y-2 flex flex-col">
                         <p className="font-semibold text-xl">{item?.name}</p>
                         <p className="font-black text-4xl">20 credits</p>
+                        <p className="text-md text-dark-grey">
+                            You currently have {user.credit}{' '}
+                            {user.credit == 1 ? 'credit' : 'credits'}.
+                        </p>
                     </div>
                     <div className="gap-y-2 flex flex-col">
                         <p className="font-semibold text-xl">
@@ -122,12 +187,25 @@ const ProductPage = () => {
                         </div>
                     </div>
                     <div className="">
-                        <button
-                            className={`${
-                                item?.stock == 0 ? 'bg-blue' : 'bg-green'
-                            } text-white font-bold px-5 py-2.5 rounded-xl`}>
-                            {item?.stock == 0 ? 'PREORDER' : 'ORDER NOW'}
-                        </button>
+                        {item?.stock == 0 ? (
+                            <button
+                                className="bg-blue text-white font-bold px-5 py-2.5 rounded-xl"
+                                onClick={preorderItem}>
+                                PREORDER
+                            </button>
+                        ) : (
+                            <button
+                                className="bg-green text-white font-bold px-5 py-2.5 rounded-xl"
+                                onClick={buyItem}>
+                                ORDER NOW
+                            </button>
+                        )}
+                    </div>
+                    <div>
+                        <p className="text-green font-medium">
+                            {successMessage}
+                        </p>
+                        <p className="text-red font-medium">{errorMessage}</p>
                     </div>
                 </div>
             </div>
