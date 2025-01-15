@@ -3,7 +3,7 @@ import { User } from '../types/User';
 
 const initialState : User = {
     uid: '',
-    name: 'Jimmy',
+    name: '',
     cat: '',
     email: '',
     credit: 0.0,

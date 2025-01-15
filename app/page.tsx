@@ -1,22 +1,51 @@
 'use client';
+
+import { useState } from 'react';
+import { API_URL } from './constants';
+import { setJwt } from '@/lib/features/sessionSlice';
+import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
+import { redirect } from 'next/dist/server/api-utils';
+import { useRouter } from 'next/navigation';
+
 // import { setUser } from '@/lib/features/userSlice';
 // import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
 
 const Login = () => {
-    // HOW TO USE REDUX (EXAMPLE)
-    // const user = useAppSelector((state) => state.user);
-    // const dispatch = useAppDispatch();
-    // const store = useAppStore();
-    // store.dispatch(
-    //     setUser({
-    //         uid: '123',
-    //         name: 'John Doe',
-    //         cat: 'ADMIN',
-    //         email: 'john.doe@example.com',
-    //         password: 'password123',
-    //         credit: 50.0,
-    //     })
-    // );
+    const store = useAppStore();
+    const router = useRouter();
+
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+    const logIn = () => {
+        setErrorMessage(null);
+        fetch(`${API_URL}/login`, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                email: email,
+                password: password,
+            }),
+        })
+            .then((resp) => {
+                return resp.json(); // show error message
+            })
+            .then((data) => {
+                console.log(data);
+                store.dispatch(
+                    setJwt({
+                        jwt: data.token,
+                    })
+                );
+                return router.push('/home');
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
 
     return (
         <div className="w-screen min-h-screen bg-white lg:bg-off-white flex lg:flex-row flex-col">
@@ -48,7 +77,10 @@ const Login = () => {
                             </label>
                             <input
                                 placeholder="Enter your email here."
-                                className="w-full bg-input px-5 py-2.5 rounded-xl text-black"></input>
+                                className="w-full bg-input px-5 py-2.5 rounded-xl text-black"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                            />
                         </div>
 
                         <div className="flex flex-col w-full">
@@ -57,13 +89,20 @@ const Login = () => {
                             </label>
                             <input
                                 placeholder="Enter your password here."
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                                 type="password"
                                 className="w-full bg-input px-5 py-2.5 rounded-xl text-black"></input>
                         </div>
                     </div>
-                    <button className="bg-red rounded-xl px-5 py-2.5 font-semibold font-white text-sm font-white">
+                    <button
+                        className="bg-red rounded-xl px-5 py-2.5 font-semibold font-white text-sm font-white"
+                        onClick={logIn}>
                         LOGIN
                     </button>
+                    {errorMessage ? (
+                        <p className="text-red">{errorMessage}</p>
+                    ) : null}
                     <p className="text-blue font-medium text-center text-sm">
                         Please reach out to our admin if you would like to
                         <br />
