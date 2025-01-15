@@ -2,6 +2,7 @@
 
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
+import Category from '../components/CategoryLabel';
 import ProductCard from '../components/ProductCard';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
@@ -17,7 +18,6 @@ const Home = () => {
     const store = useAppStore();
     const [user, setUserInPage] = useState<User>();
     const [items, setItems] = useState<Item[]>([]);
-    const uid = jwtDecode(session.jwt).sub;
 
     // const getUser = () => {
     //     const uid = jwtDecode(session.jwt).sub;
@@ -59,10 +59,9 @@ const Home = () => {
                 setItems(data.items);
             });
     };
-
     useEffect(() => {
-        console.log(userInState);
         if (userInState.user.uid.trim().length == 0) {
+            const uid = jwtDecode(session.jwt).sub;
             getUser(session.jwt, uid!).then((data) => {
                 store.dispatch(setUser(data));
                 setUserInPage(data);
