@@ -5,26 +5,8 @@ import { API_URL } from './constants';
 import { setJwt } from '@/lib/features/sessionSlice';
 import { useAppStore } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
-// TESTING
-import { getUser, addUser, updateUser, suspendUser, unsuspendUser, deleteUser } from '@/lib/backend/users';
-import { addItem, buyItem, deleteItem, getAllItems, getItemById, preorderItem, updateItem } from '@/lib/backend/items';
-
 
 const Login = () => {
-    // console.log(getUser())
-    // console.log(addUser("albert", "USER", "albert@example.com", "albertpass", 1000))
-    // console.log(updateUser("e7d73dcc10d94f19b244ce2f5c4c0d5c", {is_active: false} ))
-    // console.log(suspendUser("e7d73dcc10d94f19b244ce2f5c4c0d5c"))
-    // console.log(updateUser("e7d73dcc10d94f19b244ce2f5c4c0d5c", {is_active: false} ))
-    // console.log(deleteUser("u0003"))
-    // console.log(getAllItems())
-    // console.log(getItemById("i0001"))
-    // console.log(addItem("testItem", "image", 10, 10, "hahaha"))
-    // console.log(updateItem("5fa77a2f72604cfeb812fb04072717dd", {stock: 69}))
-    // console.log(buyItem("5fa77a2f72604cfeb812fb04072717dd", 1))
-    // console.log(preorderItem("5fa77a2f72604cfeb812fb04072717dd", 1))
-    console.log(deleteItem("8130028bc35f49a9a4f07aba272775bc"))
-
     const store = useAppStore();
     const router = useRouter();
 
