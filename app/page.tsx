@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { API_URL } from './constants';
 import { setJwt } from '@/lib/features/sessionSlice';
-import { useAppDispatch, useAppSelector, useAppStore } from '@/lib/hooks';
-import { redirect } from 'next/dist/server/api-utils';
+import { useAppStore } from '@/lib/hooks';
 import { useRouter } from 'next/navigation';
 
 // import { setUser } from '@/lib/features/userSlice';
