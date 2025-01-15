@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { User } from '../types/User';
 
-const initialState = {
+const initialState : User = {
     uid: '',
     name: 'Jimmy',
     cat: '',
     email: '',
-    password: '',
-    credit: 0.0
+    credit: 0.0,
+    is_active: true
 };
 
 const userSlice = createSlice({
@@ -19,16 +20,16 @@ const userSlice = createSlice({
             if (user_data.name !== undefined) state.name = user_data.name;
             if (user_data.cat !== undefined) state.cat = user_data.cat;
             if (user_data.email !== undefined) state.email = user_data.email;
-            if (user_data.password !== undefined) state.password = user_data.password;
             if (user_data.credit !== undefined) state.credit = user_data.credit;
+            if (user_data.is_active !== undefined) state.is_active = user_data.is_active;
         },
         clearUser(state) {
             state.uid = '';
             state.name = '';
             state.cat = 'USER';
             state.email = '';
-            state.password = '';
             state.credit = 0.0;
+            state.is_active = false;
         }
     }
 });
