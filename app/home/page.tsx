@@ -2,7 +2,6 @@
 
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
-import Category from '../components/CategoryLabel';
 import ProductCard from '../components/ProductCard';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
@@ -18,32 +17,6 @@ const Home = () => {
     const store = useAppStore();
     const [user, setUserInPage] = useState<User>();
     const [items, setItems] = useState<Item[]>([]);
-
-    // const getUser = () => {
-    //     const uid = jwtDecode(session.jwt).sub;
-    //     fetch(`${API_URL}/users/${uid}`, {
-    //         headers: {
-    //             Authorization: `Bearer ${session.jwt}`,
-    //         },
-    //         method: 'GET',
-    //     })
-    //         .then((resp) => resp.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             const loadedUser: User = {
-    //                 uid: data.user.uid,
-    //                 name: data.user.name,
-    //                 cat: data.user.cat,
-    //                 email: data.user.email,
-    //                 credit: data.user.credit,
-    //                 is_active: true,
-    //                 transactions: data.transactions,
-    //                 tasks: data.tasks,
-    //             };
-    //             store.dispatch(setUser(loadedUser));
-    //             setUserInPage(loadedUser);
-    //         });
-    // };
 
     const getItems = () => {
         fetch(`${API_URL}/items/all`, {

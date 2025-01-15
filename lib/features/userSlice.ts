@@ -20,26 +20,22 @@ const userSlice = createSlice({
     reducers: {
         setUser(state, action) {
             const user_data = action.payload;
-            state.user = {
-                uid: user_data.user.uid ?? state.user.uid,
-                name: user_data.user.name ?? state.user.name,
-                cat: user_data.user.cat ?? state.user.cat,
-                email: user_data.user.email ?? state.user.email,
-                credit: user_data.user.credit ?? state.user.credit,
-                is_active: user_data.user.is_active ?? state.user.is_active,
-            };
-            state.transactions = user_data.transactions ?? state.transactions;
-            state.tasks = user_data.tasks ?? state.tasks;
+            if (user_data.user.uid !== undefined) state.user.uid = user_data.user.uid;
+            if (user_data.user.name !== undefined) state.user.name = user_data.user.name;
+            if (user_data.user.cat !== undefined) state.user.cat = user_data.user.cat;
+            if (user_data.user.email !== undefined) state.user.email = user_data.user.email;
+            if (user_data.user.credit !== undefined) state.user.credit = user_data.user.credit;
+            if (user_data.user.is_active !== undefined) state.user.is_active = user_data.user.is_active;
+            if (user_data.transactions !== undefined) state.transactions = user_data.transactions;
+            if (user_data.tasks !== undefined) state.tasks = user_data.tasks
         },
         clearUser(state) {
-            state.user = {
-                uid: '',
-                name: '',
-                cat: 'USER',
-                email: '',
-                credit: 0.0,
-                is_active: false,
-            };
+            state.user.uid = '';
+            state.user.name = '';
+            state.user.cat = 'USER';
+            state.user.email = '';
+            state.user.credit = 0.0;
+            state.user.is_active = false;
             state.transactions = [];
             state.tasks = [];
         }
