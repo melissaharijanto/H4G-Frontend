@@ -1,7 +1,7 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import { API_URL } from '@/app/constants';
-import { getItemById } from '@/lib/backend/items';
+import { buyItem, getItemById, preorderItem } from '@/lib/backend/items';
 import { useAppSelector } from '@/lib/hooks';
 import { Item } from '@/lib/types/Item';
 import { useParams } from 'next/navigation';
@@ -28,26 +28,14 @@ const ProductPage = () => {
         setCount((count) => count - 1);
     };
 
-    const buyItem = () => {
+    const handleBuyItem = () => {
         setSuccessMessage(null);
         setErrorMessage(null);
         if (count <= 0) {
             setErrorMessage('Please buy or preorder at least 1 product.');
             return;
         } else {
-            fetch(`${API_URL}/items/buy`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.jwt}`,
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    id: item!.id,
-                    quantity: count,
-                    uid: user.user.uid,
-                }),
-            })
-                .then((resp) => resp.json())
+            buyItem(session.jwt, user.user.uid, item!.id, count)
                 .then((data) => {
                     if (!data.success) {
                         setErrorMessage(data.message);
@@ -55,29 +43,19 @@ const ProductPage = () => {
                     } else {
                         setSuccessMessage('Transaction successful!');
                     }
-                });
+                })
+                .catch((error) => console.log(error));
         }
     };
 
-    const preorderItem = () => {
+    const handlePreorderItem = () => {
         setSuccessMessage(null);
         setErrorMessage(null);
         if (count <= 0) {
             setErrorMessage('Please buy or preorder at least 1 product.');
             return;
         } else {
-            fetch(`${API_URL}/items/preorder`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${session.jwt}`,
-                },
-                method: 'POST',
-                body: JSON.stringify({
-                    id: item!.id,
-                    quantity: count,
-                    uid: user.user.uid,
-                }),
-            })
+            preorderItem(session.jwt, user.user.uid, item!.id, count)
                 .then((resp) => resp.json())
                 .then((data) => console.log(data));
         }
@@ -186,13 +164,13 @@ const ProductPage = () => {
                         {item?.stock == 0 ? (
                             <button
                                 className="bg-blue text-white font-bold px-5 py-2.5 rounded-xl"
-                                onClick={preorderItem}>
+                                onClick={handlePreorderItem}>
                                 PREORDER
                             </button>
                         ) : (
                             <button
                                 className="bg-green text-white font-bold px-5 py-2.5 rounded-xl"
-                                onClick={buyItem}>
+                                onClick={handleBuyItem}>
                                 ORDER NOW
                             </button>
                         )}
