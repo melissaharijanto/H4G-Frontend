@@ -1,7 +1,19 @@
 'use client';
+import { useAppSelector } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
+import { useEffect } from 'react';
+import { getAllUserTasks } from '@/lib/backend/tasks';
 
 const Profile = () => {
+    const user = useAppSelector((state) => state.user);
+    const session = useAppSelector((state) => state.session);
+
+    // useEffect(() => {
+    //     getAllUserTasks(session.jwt, user.user.uid).then((data) => {
+    //         console.log(data);
+    //     });
+    // }, []);
+
     return (
         <PageWithNavbar>
             <div className="flex flex-row w-full mt-8">
@@ -10,13 +22,13 @@ const Profile = () => {
                         My Profile
                     </p>
                     <p className="font-inter text-blue font-bold tracking-tight text-4xl lg:text-6xl">
-                        Nicholas Jimmy Alden
+                        {user?.user.name}
                     </p>
                     <p className="font-inter text-blue font-bold tracking-tight">
-                        nicholasjimmy@gmail.com
+                        {user?.user.email}
                     </p>
                     <p className="font-inter font-bold tracking-tight text-black">
-                        Student
+                        {user?.user.cat == 'USER' ? 'Student' : 'Admin'}
                     </p>
                     <p className="font-inter tracking-tight text-dark-grey font-inter italic text-sm ">
                         If you notice any discrepancies with your data, please
