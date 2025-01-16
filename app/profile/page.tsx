@@ -129,7 +129,7 @@ const Profile = () => {
                             Your Ongoing Quests
                         </h2>
 
-                        <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 font-bold place-items-center">
+                        <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black p-2 text-center gap-y-2 font-bold place-items-center">
                             <div className="w-full col-span-4">
                                 <hr className="w-full border-[1px] border-grey" />
                             </div>
@@ -182,7 +182,7 @@ const Profile = () => {
                             Your Pending Orders
                         </h2>
 
-                        <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black text-center gap-y-2 font-bold place-items-center">
+                        <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black text-center gap-y-2  p-2  font-bold place-items-center">
                             <div className="w-full col-span-5">
                                 <hr className="w-full border-[1px] border-grey" />
                             </div>
@@ -290,7 +290,7 @@ const Profile = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black text-center gap-y-2 font-bold place-items-center mt-8">
+                        <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] p-2 text-black text-center gap-y-2 font-bold place-items-center mt-8">
                             <div className="w-full col-span-5">
                                 <hr className="w-full border-[1px] border-grey" />
                             </div>
@@ -389,7 +389,7 @@ const Profile = () => {
                                 </p>
                             </div>
                         </div>
-                        <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 font-bold place-items-center mt-8">
+                        <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center  p-2  gap-y-2 font-bold place-items-center mt-8">
                             <div className="w-full col-span-4">
                                 <hr className="w-full border-[1px] border-grey" />
                             </div>
