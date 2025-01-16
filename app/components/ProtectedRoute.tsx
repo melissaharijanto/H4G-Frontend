@@ -8,9 +8,10 @@ const ProtectedRoute = ({ children }: { children: ReactNode }) => {
 
     if (session.jwt.length == 0 || !session.jwt) {
         redirect('/');
+        return null;
     }
 
-    return { children };
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;
