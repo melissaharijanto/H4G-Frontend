@@ -20,23 +20,10 @@ const Profile = () => {
     const convertGMTToSGT = (gmtDateString: string) => {
         // Parse the GMT date string into a Date object in UTC (GMT)
         const gmtDate = new Date(gmtDateString);
-
-        // Define options for formatting the date
-        const options = {
-            weekday: 'short', // Should be 'short' or 'long'
-            year: 'numeric', // 'numeric' or '2-digit'
-            month: 'short', // 'short' (Jan, Feb, etc.) or 'long' (January, February, etc.)
-            day: 'numeric', // 'numeric' for the day of the month (e.g., '2')
-            hour: '2-digit', // '2-digit' for two-digit hours (e.g., '07')
-            minute: '2-digit', // '2-digit' for two-digit minutes (e.g., '59')
-            hour12: false, // Use 24-hour format
-            timeZone: 'Asia/Singapore', // Ensure the timezone is Asia/Singapore
-        };
-
         // Format the date to SGT using the correct timezone (Asia/Singapore)
-        const sgtFormatted = new Intl.DateTimeFormat('en-SG', options).format(
-            gmtDate
-        );
+        const sgtFormatted = gmtDate.toLocaleString('en-SG', {
+            timeZone: 'Asia/Singapore',
+        });
 
         return sgtFormatted;
     };
@@ -56,9 +43,9 @@ const Profile = () => {
     }, []);
 
     const logOut = () => {
+        // redirect('/');
         store.dispatch(clearUser());
         store.dispatch(clearJwt());
-        redirect('/');
     };
 
     return (
