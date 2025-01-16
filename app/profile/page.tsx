@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { getAllTasks, getAllUserTasks } from '@/lib/backend/tasks';
 import { UserTask } from '@/lib/types/UserTask';
 import { clearUser } from '@/lib/features/userSlice';
-import { redirect } from 'next/navigation';
 import { clearJwt } from '@/lib/features/sessionSlice';
 import { Task } from '@/lib/types/Task';
 import ProtectedRoute from '../components/ProtectedRoute';
