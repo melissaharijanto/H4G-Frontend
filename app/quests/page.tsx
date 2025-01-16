@@ -12,6 +12,9 @@ const QuestsPage = () => {
         useState<boolean>(false);
     const [rejectedSelected, setRejectedQuestsSelected] =
         useState<boolean>(false);
+    const [results, setResults] = useState([]);
+    const [generalBoardTasks, setGeneralBoardTasks] = useState([]);
+    const [userTasks, setUserTasks] = useState([]);
 
     const handleSelection = (category: string) => {
         // Reset all categories to false

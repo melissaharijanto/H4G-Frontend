@@ -1,9 +1,10 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import userReducer from '../lib/features/userSlice.ts'
 import sessionReducer from '../lib/features/sessionSlice.ts'
-import storage from 'redux-persist/lib/storage';
+// import storage from 'redux-persist/lib/storage';
 import { FLUSH, PAUSE, PERSIST, persistReducer, PURGE, REGISTER, REHYDRATE } from 'redux-persist';
 import { persistStore } from 'redux-persist';
+import storage from './storage.ts';
 
 const persistConfig = {
   key: 'persist-mwh',

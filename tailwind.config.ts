@@ -21,6 +21,9 @@ export default {
         "dark-grey": "#888888",
         "input": "#f2f2f2",
         "dark-green": "#005440",
+        "light-green": "#41C8A8",
+        "light-yellow": "#FBC983",
+        "light-red": "#FA7E69",
       },
       fontFamily: {
         inter: "Inter, sans-serif",
