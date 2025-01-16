@@ -1,8 +1,11 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SearchIcon from '../components/icons/SearchIcon';
 import PageWithNavbar from '../components/PageWithNavbar';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { getAllTaskPostings, getAllTasks } from '@/lib/backend/tasks';
+import { useAppSelector } from '@/lib/hooks';
+import { Task } from '@/lib/types/Task';
 
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
@@ -12,8 +15,10 @@ const QuestsPage = () => {
     const [rejectedSelected, setRejectedQuestsSelected] =
         useState<boolean>(false);
     const [results, setResults] = useState([]);
-    const [generalBoardTasks, setGeneralBoardTasks] = useState([]);
+    const [generalBoardTasks, setGeneralBoardTasks] = useState<Task[]>([]);
     const [userTasks, setUserTasks] = useState([]);
+
+    const session = useAppSelector((state) => state.session);
 
     const handleSelection = (category: string) => {
         // Reset all categories to false
@@ -30,6 +35,13 @@ const QuestsPage = () => {
             setRejectedQuestsSelected(true);
         }
     };
+
+    useEffect(() => {
+        getAllTasks(session.jwt).then((data) => {
+            console.log(data);
+            setGeneralBoardTasks(data.tasks);
+        });
+    }, []);
 
     return (
         <ProtectedRoute>
@@ -75,22 +87,29 @@ const QuestsPage = () => {
                             />
                         </div>
                     </div>
-                    <div className="border-2 border-grey rounded-xl">
-                        <div className="grid grid-cols-[1fr_2fr_1fr_2fr] py-4 text-black font-bold place-items-center bg-input rounded-t-xl">
+                    <div className="border-2 border-grey rounded-xl text-center">
+                        <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] py-4 text-black font-bold place-items-center bg-input rounded-t-xl">
+                            <p>No.</p>
                             <p>Task ID</p>
                             <p>Task Name</p>
-                            <p>Number of People Needed</p>
+                            <p>End Time</p>
                             <p>Status</p>
                         </div>
-                        <div className="grid grid-cols-[1fr_2fr_1fr_2fr] text-black font-medium place-items-center bg-white py-4 gap-y-4">
-                            <p>Task ID</p>
-                            <p>Task Name</p>
-                            <p>Number of People Needed</p>
-                            <p>Status</p>
-                            <div className="col-span-4 w-full">
-                                <hr className="border-[1px] border-grey" />
+                        {generalBoardTasks.map((task, index) => (
+                            <div
+                                className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black font-medium place-items-center bg-white py-4 gap-y-4"
+                                key={task.id}>
+                                <p>{index + 1}</p>
+                                <p>{task.id}</p>
+                                <p>{task.name}</p>
+                                <p>{task.end_time}</p>
+                                <p></p>
+                                <div className="col-span-5 w-full">
+                                    <hr className="border-[1px] border-grey" />
+                                </div>
                             </div>
-                        </div>
+                        ))}
+
                         <div className="bg-white rounded-b-xl p-2"></div>
                     </div>
                 </div>
