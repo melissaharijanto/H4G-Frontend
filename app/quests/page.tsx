@@ -97,16 +97,21 @@ const QuestsPage = () => {
                         </div>
                         {generalBoardTasks.map((task, index) => (
                             <div
-                                className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black font-medium place-items-center bg-white py-4 gap-y-4"
+                                className={`grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black font-medium place-items-center bg-white ${
+                                    index === 0 ? 'pt-4' : 'pt-2'
+                                } pb-2 gap-y-4`}
                                 key={task.id}>
                                 <p>{index + 1}</p>
                                 <p>{task.id}</p>
                                 <p>{task.name}</p>
                                 <p>{task.end_time}</p>
                                 <p></p>
-                                <div className="col-span-5 w-full">
-                                    <hr className="border-[1px] border-grey" />
-                                </div>
+                                {index ===
+                                generalBoardTasks.length - 1 ? null : (
+                                    <div className="col-span-5 w-full">
+                                        <hr className="border-[1px] border-grey" />
+                                    </div>
+                                )}
                             </div>
                         ))}
 
