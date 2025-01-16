@@ -63,7 +63,7 @@ const Profile = () => {
     return (
         <PageWithNavbar>
             <div className="p-8 flex flex-col gap-y-8">
-                <div className="flex flex-row w-full mt-8">
+                <div className="flex flex-row w-full">
                     <div className="w-full bg-cover bg-no-repeat bg-center flex flex-col justify-center gap-y-2 items-start">
                         <div>
                             <p className="font-inter font-bold tracking-tight text-2xl text-red mb-2">
