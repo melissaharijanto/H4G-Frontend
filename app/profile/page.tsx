@@ -168,7 +168,7 @@ const Profile = () => {
                                         </p>
                                         <p className="font-inter">
                                             {convertGMTToSGT(
-                                                taskData[0].end_time
+                                                taskData[0]?.end_time
                                             )}
                                         </p>
                                         <div className="w-full col-span-4">
@@ -442,7 +442,7 @@ const Profile = () => {
                                         </p>
                                         <p className="font-inter">
                                             {convertGMTToSGT(
-                                                taskData[0].end_time
+                                                taskData[0]?.end_time
                                             )}
                                         </p>
                                         <div className="w-full col-span-4">
