@@ -131,14 +131,14 @@ const Profile = () => {
 
                         <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 font-bold place-items-center">
                             <div className="w-full col-span-4">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                             <p className="text-center">No.</p>
                             <p className="text-center">Quest ID</p>
                             <p className="text-center">Status</p>
                             <p className="text-center">End Date</p>
                             <div className="w-full col-span-4">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                         </div>
                         {userTasks.slice(0, 5).map((task, index) => {
@@ -164,7 +164,7 @@ const Profile = () => {
                                         {convertGMTToSGT(taskData[0].end_time)}
                                     </p>
                                     <div className="w-full col-span-4">
-                                        <hr className="w-full border-2 border-grey" />
+                                        <hr className="w-full border-[1px] border-grey" />
                                     </div>
                                 </div>
                             );
@@ -184,7 +184,7 @@ const Profile = () => {
 
                         <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black text-center gap-y-2 font-bold place-items-center">
                             <div className="w-full col-span-5">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                             <p className="text-center">No.</p>
                             <p className="text-center">Transaction ID</p>
@@ -192,7 +192,7 @@ const Profile = () => {
                             <p className="text-center">Quantity</p>
                             <p className="text-center">Status</p>
                             <div className="w-full col-span-5">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                         </div>
                         {user.transactions
@@ -224,7 +224,7 @@ const Profile = () => {
                                             </span>
                                         </p>
                                         <div className="w-full col-span-5">
-                                            <hr className="w-full border-2 border-grey" />
+                                            <hr className="w-full border-[1px] border-grey" />
                                         </div>
                                     </div>
                                 );
@@ -292,7 +292,7 @@ const Profile = () => {
                         </div>
                         <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black text-center gap-y-2 font-bold place-items-center mt-8">
                             <div className="w-full col-span-5">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                             <p className="text-center">No.</p>
                             <p className="text-center">Transaction ID</p>
@@ -300,7 +300,7 @@ const Profile = () => {
                             <p className="text-center">Quantity</p>
                             <p className="text-center">Status</p>
                             <div className="w-full col-span-5">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                         </div>
 
@@ -323,7 +323,7 @@ const Profile = () => {
                                         </span>
                                     </p>
                                     <div className="w-full col-span-5">
-                                        <hr className="w-full border-2 border-grey" />
+                                        <hr className="w-full border-[1px] border-grey" />
                                     </div>
                                 </div>
                             );
@@ -391,14 +391,14 @@ const Profile = () => {
                         </div>
                         <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 font-bold place-items-center mt-8">
                             <div className="w-full col-span-4">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                             <p className="text-center">No.</p>
                             <p className="text-center">Quest ID</p>
                             <p className="text-center">Status</p>
                             <p className="text-center">End Date</p>
                             <div className="w-full col-span-4">
-                                <hr className="w-full border-2 border-grey" />
+                                <hr className="w-full border-[1px] border-grey" />
                             </div>
                         </div>
                         {userTasks.map((task, index) => {
@@ -422,7 +422,7 @@ const Profile = () => {
                                         {convertGMTToSGT(taskData[0].end_time)}
                                     </p>
                                     <div className="w-full col-span-4">
-                                        <hr className="w-full border-2 border-grey" />
+                                        <hr className="w-full border-[1px] border-grey" />
                                     </div>
                                 </div>
                             );

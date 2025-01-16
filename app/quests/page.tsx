@@ -6,8 +6,6 @@ import PageWithNavbar from '../components/PageWithNavbar';
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
         useState<boolean>(true);
-    const [dailyQuestsSelected, setDailyQuestsSelected] =
-        useState<boolean>(false);
     const [assignedQuestsSelected, setAssignedQuestsSelected] =
         useState<boolean>(false);
     const [rejectedSelected, setRejectedQuestsSelected] =
@@ -19,15 +17,12 @@ const QuestsPage = () => {
     const handleSelection = (category: string) => {
         // Reset all categories to false
         setGeneralBoardSelected(false);
-        setDailyQuestsSelected(false);
         setAssignedQuestsSelected(false);
         setRejectedQuestsSelected(false);
 
         // Set the selected category to true
         if (category === 'generalBoard') {
             setGeneralBoardSelected(true);
-        } else if (category === 'dailyQuests') {
-            setDailyQuestsSelected(true);
         } else if (category === 'assignedQuests') {
             setAssignedQuestsSelected(true);
         } else if (category === 'rejected') {
@@ -45,13 +40,6 @@ const QuestsPage = () => {
                         }`}
                         onClick={() => handleSelection('generalBoard')}>
                         General Board
-                    </button>
-                    <button
-                        className={`${
-                            dailyQuestsSelected ? '!text-blue underline' : ''
-                        }`}
-                        onClick={() => handleSelection('dailyQuests')}>
-                        Daily Quests
                     </button>
                     <button
                         className={`${
@@ -82,17 +70,20 @@ const QuestsPage = () => {
                     </div>
                 </div>
                 <div className="border-2 border-grey rounded-xl">
-                    <div className="grid grid-cols-[1fr_2fr_1fr_2fr] p-2 text-black font-bold place-items-center bg-input rounded-t-xl">
+                    <div className="grid grid-cols-[1fr_2fr_1fr_2fr] py-4 text-black font-bold place-items-center bg-input rounded-t-xl">
                         <p>Task ID</p>
                         <p>Task Name</p>
                         <p>Number of People Needed</p>
                         <p>Status</p>
                     </div>
-                    <div className="grid grid-cols-[1fr_2fr_1fr_2fr] text-black font-medium place-items-center bg-white p-2">
+                    <div className="grid grid-cols-[1fr_2fr_1fr_2fr] text-black font-medium place-items-center bg-white py-4 gap-y-4">
                         <p>Task ID</p>
                         <p>Task Name</p>
                         <p>Number of People Needed</p>
                         <p>Status</p>
+                        <div className="col-span-4 w-full">
+                            <hr className="border-[1px] border-grey" />
+                        </div>
                     </div>
                     <div className="bg-white rounded-b-xl p-2"></div>
                 </div>
