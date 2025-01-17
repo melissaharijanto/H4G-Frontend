@@ -3,9 +3,14 @@ import { useEffect, useState } from 'react';
 import SearchIcon from '../components/icons/SearchIcon';
 import PageWithNavbar from '../components/PageWithNavbar';
 import ProtectedRoute from '../components/ProtectedRoute';
-import { getAllTaskPostings, getAllTasks } from '@/lib/backend/tasks';
+import {
+    getAllTaskPostings,
+    getAllTasks,
+    getAllUserTasks,
+} from '@/lib/backend/tasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
+import { UserTask } from '@/lib/types/UserTask';
 
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
@@ -14,10 +19,12 @@ const QuestsPage = () => {
         useState<boolean>(false);
     const [rejectedSelected, setRejectedQuestsSelected] =
         useState<boolean>(false);
-    const [results, setResults] = useState([]);
+    const [results, setResults] = useState<Task[] | UserTask[]>([]);
     const [generalBoardTasks, setGeneralBoardTasks] = useState<Task[]>([]);
     const [userTasks, setUserTasks] = useState([]);
+    const [allTasks, setAllTasks] = useState([]);
 
+    const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
 
     const handleSelection = (category: string) => {
@@ -29,19 +36,45 @@ const QuestsPage = () => {
         // Set the selected category to true
         if (category === 'generalBoard') {
             setGeneralBoardSelected(true);
+            setResults(generalBoardTasks);
         } else if (category === 'assignedQuests') {
             setAssignedQuestsSelected(true);
+            setResults(
+                userTasks.filter((task: UserTask) => task.status === 'ONGOING')
+            );
         } else if (category === 'rejected') {
             setRejectedQuestsSelected(true);
+            setResults(
+                userTasks.filter((task: UserTask) => task.status === 'REJECTED')
+            );
         }
     };
+
+    function isUserTask(task: Task | UserTask): task is UserTask {
+        return (task as UserTask).task !== undefined; // Check for the presence of 'task' property
+    }
+
+    useEffect(() => {
+        getAllUserTasks(session.jwt, user.user.uid).then((data) => {
+            setUserTasks(data.usertasks);
+        });
+    }, []);
 
     useEffect(() => {
         getAllTasks(session.jwt).then((data) => {
             console.log(data);
-            setGeneralBoardTasks(data.tasks);
+            const tasks = data.tasks;
+            const filteredTasks = tasks.filter(
+                (task: Task) =>
+                    !userTasks.some(
+                        (userTask: UserTask) => userTask.task === task.id
+                    )
+            );
+            setGeneralBoardTasks(filteredTasks);
+            setResults(filteredTasks);
+            setAllTasks(data.tasks);
         });
-    }, []);
+    }, [userTasks]);
 
     return (
         <ProtectedRoute>
@@ -95,25 +128,87 @@ const QuestsPage = () => {
                             <p>End Time</p>
                             <p>Status</p>
                         </div>
-                        {generalBoardTasks.map((task, index) => (
-                            <div
-                                className={`grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black font-medium place-items-center bg-white ${
-                                    index === 0 ? 'pt-4' : 'pt-2'
-                                } pb-2 gap-y-4`}
-                                key={task.id}>
-                                <p>{index + 1}</p>
-                                <p>{task.id}</p>
-                                <p>{task.name}</p>
-                                <p>{task.end_time}</p>
-                                <p></p>
-                                {index ===
-                                generalBoardTasks.length - 1 ? null : (
-                                    <div className="col-span-5 w-full">
-                                        <hr className="border-[1px] border-grey" />
-                                    </div>
-                                )}
+                        {results.length == 0 ? (
+                            <div className="pt-4">
+                                <p className="text-dark-grey font-medium">
+                                    {generalBoardSelected
+                                        ? 'There are currently no quests available.'
+                                        : assignedQuestsSelected
+                                        ? 'You do not have any assigned quests at the moment.'
+                                        : rejectedSelected
+                                        ? 'You do not have any rejected quests.'
+                                        : null}
+                                </p>
                             </div>
-                        ))}
+                        ) : (
+                            results.map((task, index) => {
+                                let taskData: Task[];
+                                if (isUserTask(task)) {
+                                    taskData = allTasks.filter(
+                                        (generalTask) =>
+                                            generalTask.id === task.task
+                                    );
+                                }
+
+                                return (
+                                    <div
+                                        className={`grid grid-cols-[1fr_2fr_2fr_2fr_2fr] text-black font-medium place-items-center bg-white ${
+                                            index === 0 ? 'pt-4' : 'pt-2'
+                                        } pb-2 gap-y-4`}
+                                        key={task.id}>
+                                        <p>{index + 1}</p>
+                                        <a
+                                            href={
+                                                isUserTask(task)
+                                                    ? `/quests/${taskData[0].id}`
+                                                    : `/quests/${task.id}`
+                                            }
+                                            className="!font-bold !text-blue underline">
+                                            {isUserTask(task)
+                                                ? taskData[0].id
+                                                : task.id}
+                                        </a>
+                                        <p>{task.name || taskData[0].name}</p>
+                                        <p>
+                                            {isUserTask(task)
+                                                ? new Date(
+                                                      taskData[0].end_time
+                                                  ).toLocaleString('en-SG', {
+                                                      timeZone:
+                                                          'Asia/Singapore',
+                                                  })
+                                                : new Date(
+                                                      task.end_time
+                                                  ).toLocaleString('en-SG', {
+                                                      timeZone:
+                                                          'Asia/Singapore',
+                                                  })}
+                                        </p>
+                                        {generalBoardSelected ? (
+                                            <button className="bg-blue px-4 py-2 font-semibold rounded-xl text-white">
+                                                APPLY
+                                            </button>
+                                        ) : assignedQuestsSelected ? (
+                                            <p className="bg-yellow px-4 py-2 font-semibold rounded-xl text-white">
+                                                {isUserTask(task)
+                                                    ? task.status
+                                                    : null}
+                                            </p>
+                                        ) : rejectedSelected ? (
+                                            <p className="bg-red px-4 py-2 font-semibold rounded-xl text-white">
+                                                REJECTED
+                                            </p>
+                                        ) : null}
+                                        {index ===
+                                        generalBoardTasks.length - 1 ? null : (
+                                            <div className="col-span-5 w-full">
+                                                <hr className="border-[1px] border-grey" />
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })
+                        )}
 
                         <div className="bg-white rounded-b-xl p-2"></div>
                     </div>

@@ -8,7 +8,7 @@ import storage from './storage.ts';
 
 const persistConfig = {
   key: 'persist-mwh',
-  storage
+  storage,
 }
 
 const rootReducers = combineReducers({
