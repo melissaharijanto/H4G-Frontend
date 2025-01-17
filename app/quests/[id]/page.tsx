@@ -1,5 +1,6 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
+import ProtectedRoute from '@/app/components/ProtectedRoute';
 import { getAllTasks, getAllUserTasks } from '@/lib/backend/tasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
@@ -67,106 +68,112 @@ const IndividualQuestPage = () => {
     }, [task]);
 
     return (
-        <PageWithNavbar>
-            <div className="font-inter p-8 flex-col flex gap-y-8">
-                <div>
-                    <a
-                        href="/quests"
-                        className="text-blue underline font-medium px-4 py-2 rounded-xl hover:font-bold transition-all ease-in">
-                        {'< Back'}
-                    </a>
-                </div>
-                <div className="bg-white p-8 shadow-custom rounded-xl flex flex-col gap-y-8 lg:gap-y-0 lg:flex-row lg:justify-between">
-                    <div className="gap-y-8 flex flex-col">
-                        <div className="flex flex-col gap-y-2">
-                            <p className="font-bold text-dark-grey text-lg">
-                                Task ID - {task?.id}
-                            </p>
-                            <p className="font-black text-blue text-4xl">
-                                {task?.name}
-                            </p>
-                            <p className="font-medium text-dark-grey">
-                                Posted by User ID {task?.created_by}
-                            </p>
-                        </div>
-                        <div className="font-bold text-black text-lg">
-                            <p>
-                                Start time:{' '}
-                                <span className="font-medium">
-                                    {convertGMTToSGT(task?.start_time)}
-                                </span>
-                            </p>
-                            <p>
-                                End time:{' '}
-                                <span className="font-medium">
-                                    {convertGMTToSGT(task?.end_time)}
-                                </span>
-                            </p>
-                        </div>
-                        <div>
-                            {applied ? (
-                                <button
-                                    disabled
-                                    className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold">
-                                    APPLIED
-                                </button>
-                            ) : (
-                                <button className="bg-blue rounded-xl text-white px-4 py-2 font-semibold">
-                                    APPLY
-                                </button>
-                            )}
-                        </div>
-                        <div>
-                            <p className="font-semibold text-black text-lg">
-                                Task Description
-                            </p>
-                            <p className="text-black">{task?.description}</p>
-                        </div>
-                    </div>
+        <ProtectedRoute>
+            <PageWithNavbar>
+                <div className="font-inter p-8 flex-col flex gap-y-8">
                     <div>
+                        <a
+                            href="/quests"
+                            className="text-blue underline font-medium px-4 py-2 rounded-xl hover:font-bold transition-all ease-in">
+                            {'< Back'}
+                        </a>
+                    </div>
+                    <div className="bg-white p-8 shadow-custom rounded-xl flex flex-col gap-y-8 lg:gap-y-0 lg:flex-row lg:justify-between">
+                        <div className="gap-y-8 flex flex-col">
+                            <div className="flex flex-col gap-y-2">
+                                <p className="font-bold text-dark-grey text-lg">
+                                    Task ID - {task?.id}
+                                </p>
+                                <p className="font-black text-blue text-4xl">
+                                    {task?.name}
+                                </p>
+                                <p className="font-medium text-dark-grey">
+                                    Posted by User ID {task?.created_by}
+                                </p>
+                            </div>
+                            <div className="font-bold text-black text-lg">
+                                <p>
+                                    Start time:{' '}
+                                    <span className="font-medium">
+                                        {convertGMTToSGT(task?.start_time)}
+                                    </span>
+                                </p>
+                                <p>
+                                    End time:{' '}
+                                    <span className="font-medium">
+                                        {convertGMTToSGT(task?.end_time)}
+                                    </span>
+                                </p>
+                            </div>
+                            <div>
+                                {applied ? (
+                                    <button
+                                        disabled
+                                        className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold">
+                                        APPLIED
+                                    </button>
+                                ) : (
+                                    <button className="bg-blue rounded-xl text-white px-4 py-2 font-semibold">
+                                        APPLY
+                                    </button>
+                                )}
+                            </div>
+                            <div>
+                                <p className="font-semibold text-black text-lg">
+                                    Task Description
+                                </p>
+                                <p className="text-black">
+                                    {task?.description}
+                                </p>
+                            </div>
+                        </div>
                         <div>
-                            {userTask ? (
-                                <div className="gap-y-4 flex flex-col">
-                                    <p className="font-bold text-black">
-                                        Your current status: {userTask.status}
-                                    </p>
-                                    <div className="gap-y-2 flex flex-col">
-                                        {statuses.map((st, index) => {
-                                            return (
-                                                <div key={index + 1}>
-                                                    <div className="flex gap-x-2 items-center">
-                                                        <p className="text-white font-bold bg-blue rounded-full px-4 py-2">
-                                                            {index + 1}
-                                                        </p>
-                                                        <p
-                                                            className={`font-semibold text-white rounded-xl ${statusColorDict[st]} px-4 py-1`}>
-                                                            {st}
-                                                        </p>
-                                                        {userTask.status ===
-                                                        st ? (
-                                                            <p className="font-medium text-black">
-                                                                You are
-                                                                currently here!
+                            <div>
+                                {userTask ? (
+                                    <div className="gap-y-4 flex flex-col">
+                                        <p className="font-bold text-black">
+                                            Your current status:{' '}
+                                            {userTask.status}
+                                        </p>
+                                        <div className="gap-y-2 flex flex-col">
+                                            {statuses.map((st, index) => {
+                                                return (
+                                                    <div key={index + 1}>
+                                                        <div className="flex gap-x-2 items-center">
+                                                            <p className="text-white font-bold bg-blue rounded-full px-4 py-2">
+                                                                {index + 1}
                                                             </p>
-                                                        ) : null}
+                                                            <p
+                                                                className={`font-semibold text-white rounded-xl ${statusColorDict[st]} px-4 py-1`}>
+                                                                {st}
+                                                            </p>
+                                                            {userTask.status ===
+                                                            st ? (
+                                                                <p className="font-medium text-black">
+                                                                    You are
+                                                                    currently
+                                                                    here!
+                                                                </p>
+                                                            ) : null}
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
                                     </div>
-                                </div>
-                            ) : (
-                                <div className="gap-y-4 flex flex-col">
-                                    <p className="font-bold text-black">
-                                        Your current status: NOT APPLIED
-                                    </p>
-                                </div>
-                            )}
+                                ) : (
+                                    <div className="gap-y-4 flex flex-col">
+                                        <p className="font-bold text-black">
+                                            Your current status: NOT APPLIED
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </PageWithNavbar>
+            </PageWithNavbar>
+        </ProtectedRoute>
     );
 };
 
