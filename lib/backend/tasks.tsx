@@ -1,7 +1,6 @@
 import { call } from '@/lib/backend/common';
 import { Resp } from '@/lib/types/Resp';
 import { Task } from '@/lib/types/Task';
-import { UserTask } from '@/lib/types/UserTask';
 
 export async function getAllTasks(jwt: string): Promise<Task[]> {
     return call<Task[]>('/tasks/all', 'GET', jwt);
@@ -70,7 +69,11 @@ export async function deleteTask(jwt: string, id: string): Promise<Resp> {
     return call<Resp>('/tasks/delete', 'DELETE', jwt, body);
 }
 
-export async function applyForTask(jwt: string, uid: string, id: string): Promise<Resp> {
+export async function applyForTask(
+    jwt: string,
+    uid: string,
+    id: string
+): Promise<Resp> {
     const body = {
         uid,
         id,
