@@ -18,8 +18,8 @@ const QuestsPage = () => {
         useState<boolean>(false);
     const [results, setResults] = useState<Task[] | UserTask[]>([]);
     const [generalBoardTasks, setGeneralBoardTasks] = useState<Task[]>([]);
-    const [userTasks, setUserTasks] = useState([]);
-    const [allTasks, setAllTasks] = useState([]);
+    const [userTasks, setUserTasks] = useState<UserTask[]>([]);
+    const [allTasks, setAllTasks] = useState<Task[]>([]);
 
     const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
@@ -261,7 +261,10 @@ const QuestsPage = () => {
                                                     </button>
                                                 ) : (
                                                     <p className="bg-yellow px-4 py-2 font-semibold rounded-xl text-white">
-                                                        {task.status}
+                                                        {
+                                                            (task as UserTask)
+                                                                .status
+                                                        }
                                                     </p>
                                                 )}
                                             </>

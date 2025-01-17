@@ -55,7 +55,7 @@ const IndividualQuestPage = () => {
                 setApplied(true);
                 getAllUserTasks(session.jwt).then((data) => {
                     const filteredUserTask = data.usertasks.filter(
-                        (ut) => task.id === ut.task && ut.uid === user.user.uid
+                        (ut) => task!.id === ut.task && ut.uid === user.user.uid
                     );
                     setUserTask(filteredUserTask[0]);
                 });

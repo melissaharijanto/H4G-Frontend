@@ -2,12 +2,12 @@ import { call } from '@/lib/backend/common';
 import { Resp } from '@/lib/types/Resp';
 import { Task } from '@/lib/types/Task';
 
-export async function getAllTasks(jwt: string): Promise<Task[]> {
-    return call<Task[]>('/tasks/all', 'GET', jwt);
+export async function getAllTasks(jwt: string): Promise<{ tasks: Task[] }> {
+    return call<{ tasks: Task[] }>('/tasks/all', 'GET', jwt);
 }
 
 export async function getTaskById(jwt: string, id: string): Promise<Task> {
-    const all_tasks: Task[] = await getAllTasks(jwt); // Fetch all tasks
+    const all_tasks: { tasks: Task[] } = await getAllTasks(jwt); // Fetch all tasks
 
     // Find the task with the matching ID
     const task = all_tasks.find((task) => task.id === id);

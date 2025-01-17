@@ -2,8 +2,10 @@ import { call } from '@/lib/backend/common';
 import { Resp } from '@/lib/types/Resp';
 import { UserTask } from '@/lib/types/UserTask';
 
-export async function getAllUserTasks(jwt: string): Promise<UserTask[]> {
-    return call<UserTask[]>('/usertasks/all', 'GET', jwt);
+export async function getAllUserTasks(
+    jwt: string
+): Promise<{ usertasks: UserTask[] }> {
+    return call<{ userTasks: UserTask[] }>('/usertasks/all', 'GET', jwt);
 }
 
 // Approve a UserTask (status -> ONGOING)
@@ -26,7 +28,6 @@ export async function completeUserTask(jwt: string, id: string): Promise<Resp> {
     return updateUserTask(jwt, id, { status: 'COMPLETED' });
 }
 
-
 export async function updateUserTask(
     jwt: string,
     id: string,
@@ -40,7 +41,6 @@ export async function updateUserTask(
     };
     return call<Resp>('/usertasks/update', 'PATCH', jwt, body);
 }
-
 
 // use this to cancel applied task
 export async function deleteUserTask(jwt: string, id: string): Promise<Resp> {
