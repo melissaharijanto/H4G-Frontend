@@ -10,7 +10,7 @@ export async function getTaskById(jwt: string, id: string): Promise<Task> {
     const all_tasks: { tasks: Task[] } = await getAllTasks(jwt); // Fetch all tasks
 
     // Find the task with the matching ID
-    const task = all_tasks.find((task) => task.id === id);
+    const task = all_tasks.tasks.find((task) => task.id === id);
 
     if (!task) {
         throw new Error(`Task with ID ${id} not found`);

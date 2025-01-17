@@ -5,7 +5,7 @@ import { UserTask } from '@/lib/types/UserTask';
 export async function getAllUserTasks(
     jwt: string
 ): Promise<{ usertasks: UserTask[] }> {
-    return call<{ userTasks: UserTask[] }>('/usertasks/all', 'GET', jwt);
+    return call<{ usertasks: UserTask[] }>('/usertasks/all', 'GET', jwt);
 }
 
 // Approve a UserTask (status -> ONGOING)

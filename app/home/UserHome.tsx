@@ -8,6 +8,7 @@ import { getUser } from '@/lib/backend/users';
 import { setUser } from '@/lib/features/userSlice';
 import { getAllItems } from '@/lib/backend/items';
 import { jwtDecode } from 'jwt-decode';
+import { User } from '@/lib/types/User';
 
 const UserHome = () => {
     const userInState = useAppSelector((state) => state.user);
