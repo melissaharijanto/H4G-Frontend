@@ -2,12 +2,13 @@
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
 import { useEffect, useState } from 'react';
-import { getAllTasks, getAllUserTasks } from '@/lib/backend/tasks';
+import { getAllTasks } from '@/lib/backend/tasks';
 import { UserTask } from '@/lib/types/UserTask';
 import { clearUser } from '@/lib/features/userSlice';
 import { clearJwt } from '@/lib/features/sessionSlice';
 import { Task } from '@/lib/types/Task';
 import ProtectedRoute from '../components/ProtectedRoute';
+import { getAllUserTasks } from '@/lib/backend/usertasks';
 
 const Profile = () => {
     const user = useAppSelector((state) => state.user);
@@ -28,9 +29,11 @@ const Profile = () => {
     };
 
     useEffect(() => {
-        getAllUserTasks(session.jwt, user.user.uid).then((data) => {
+        getAllUserTasks(session.jwt).then((data) => {
             console.log(data);
-            setUserTasks(data.usertasks);
+            setUserTasks(
+                data.usertasks.filter((ut) => ut.uid === user.user.uid)
+            );
         });
 
         getAllTasks(session.jwt).then((data) => {
@@ -154,7 +157,7 @@ const Profile = () => {
                                         </p>
                                         <p className="font-inter">
                                             {convertGMTToSGT(
-                                                taskData[0]?.end_time
+                                                taskData[0]?.deadline
                                             )}
                                         </p>
                                         <div className="w-full col-span-4">
@@ -428,7 +431,7 @@ const Profile = () => {
                                         </p>
                                         <p className="font-inter">
                                             {convertGMTToSGT(
-                                                taskData[0]?.end_time
+                                                taskData[0]?.deadline
                                             )}
                                         </p>
                                         <div className="w-full col-span-4">

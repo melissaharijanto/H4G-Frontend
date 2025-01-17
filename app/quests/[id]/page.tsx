@@ -1,7 +1,8 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
-import { getAllTasks, getAllUserTasks } from '@/lib/backend/tasks';
+import { getAllTasks } from '@/lib/backend/tasks';
+import { getAllUserTasks } from '@/lib/backend/usertasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
@@ -55,10 +56,10 @@ const IndividualQuestPage = () => {
     }, []);
 
     useEffect(() => {
-        getAllUserTasks(session.jwt, user.user.uid).then((data) => {
+        getAllUserTasks(session.jwt).then((data) => {
             console.log(data.usertasks);
             const specificUserTask = data.usertasks.filter(
-                (ut: UserTask) => ut.task == id
+                (ut: UserTask) => ut.task == id && ut.uid === user.user.uid
             );
             if (specificUserTask.length > 0) {
                 setApplied(true);
@@ -101,7 +102,7 @@ const IndividualQuestPage = () => {
                                 <p>
                                     End time:{' '}
                                     <span className="font-medium">
-                                        {convertGMTToSGT(task?.end_time)}
+                                        {convertGMTToSGT(task?.deadline)}
                                     </span>
                                 </p>
                             </div>

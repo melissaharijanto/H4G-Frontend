@@ -3,14 +3,11 @@ import { useEffect, useState } from 'react';
 import SearchIcon from '../components/icons/SearchIcon';
 import PageWithNavbar from '../components/PageWithNavbar';
 import ProtectedRoute from '../components/ProtectedRoute';
-import {
-    getAllTaskPostings,
-    getAllTasks,
-    getAllUserTasks,
-} from '@/lib/backend/tasks';
+import { getAllTasks } from '@/lib/backend/tasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
+import { getAllUserTasks } from '@/lib/backend/usertasks';
 
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
@@ -55,8 +52,11 @@ const QuestsPage = () => {
     }
 
     useEffect(() => {
-        getAllUserTasks(session.jwt, user.user.uid).then((data) => {
-            setUserTasks(data.usertasks);
+        getAllUserTasks(session.jwt).then((data) => {
+            setUserTasks(
+                data.usertasks.filter((ut) => ut.uid === user.user.uid)
+            );
+            console.log(data);
         });
     }, []);
 
@@ -64,11 +64,10 @@ const QuestsPage = () => {
         getAllTasks(session.jwt).then((data) => {
             console.log(data);
             const tasks = data.tasks;
-            const filteredTasks = tasks.filter(
-                (task: Task) =>
-                    !userTasks.some(
-                        (userTask: UserTask) => userTask.task === task.id
-                    )
+            const filteredTasks = tasks.filter((task: Task) =>
+                userTasks.some(
+                    (userTask: UserTask) => userTask.task !== task.id
+                )
             );
             setGeneralBoardTasks(filteredTasks);
             setResults(filteredTasks);
@@ -125,7 +124,7 @@ const QuestsPage = () => {
                             <p>No.</p>
                             <p>Task ID</p>
                             <p>Task Name</p>
-                            <p>End Time</p>
+                            <p>Deadline</p>
                             <p>Status</p>
                         </div>
                         {results.length == 0 ? (
@@ -172,13 +171,13 @@ const QuestsPage = () => {
                                         <p>
                                             {isUserTask(task)
                                                 ? new Date(
-                                                      taskData[0].end_time
+                                                      taskData[0].deadline
                                                   ).toLocaleString('en-SG', {
                                                       timeZone:
                                                           'Asia/Singapore',
                                                   })
                                                 : new Date(
-                                                      task.end_time
+                                                      task.deadline
                                                   ).toLocaleString('en-SG', {
                                                       timeZone:
                                                           'Asia/Singapore',
