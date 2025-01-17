@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import ProfileIcon from './icons/ProfileIcon';
 
 const AdminNavbar = () => {
@@ -9,10 +10,10 @@ const AdminNavbar = () => {
             <img src="/mwh-logo.png" className="w-52" />
 
             <div className="text-blue font-bold font-inter flex gap-x-24 relative">
-                <a href="/home">Home</a>
-                <a href="/inventory">Inventory</a>
-                <a href="/request">Students</a>
-                <a href="/quests">Quests</a>
+                <Link href="/home">Home</Link>
+                <Link href="/inventory">Inventory</Link>
+                <Link href="/request">Students</Link>
+                <Link href="/quests">Quests</Link>
             </div>
             <div className="flex gap-x-12">
                 <a href="/profile">
