@@ -3,16 +3,16 @@ import { useEffect, useState } from 'react';
 import SearchIcon from '../components/icons/SearchIcon';
 import PageWithNavbar from '../components/PageWithNavbar';
 import ProtectedRoute from '../components/ProtectedRoute';
-import { getAllTasks } from '@/lib/backend/tasks';
+import { applyForTask, getAllTasks } from '@/lib/backend/tasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
-import { getAllUserTasks } from '@/lib/backend/usertasks';
+import { deleteUserTask, getAllUserTasks } from '@/lib/backend/usertasks';
 
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
         useState<boolean>(true);
-    const [assignedQuestsSelected, setAssignedQuestsSelected] =
+    const [pendingQuestsSelected, setPendingQuestsSelected] =
         useState<boolean>(false);
     const [rejectedSelected, setRejectedQuestsSelected] =
         useState<boolean>(false);
@@ -27,17 +27,22 @@ const QuestsPage = () => {
     const handleSelection = (category: string) => {
         // Reset all categories to false
         setGeneralBoardSelected(false);
-        setAssignedQuestsSelected(false);
+        setPendingQuestsSelected(false);
         setRejectedQuestsSelected(false);
 
         // Set the selected category to true
         if (category === 'generalBoard') {
             setGeneralBoardSelected(true);
             setResults(generalBoardTasks);
-        } else if (category === 'assignedQuests') {
-            setAssignedQuestsSelected(true);
+        } else if (category === 'pendingQuests') {
+            setPendingQuestsSelected(true);
             setResults(
-                userTasks.filter((task: UserTask) => task.status === 'ONGOING')
+                userTasks.filter(
+                    (task: UserTask) =>
+                        task.status === 'APPLIED' ||
+                        task.status === 'ONGOING' ||
+                        task.status === 'UNDER_REVIEW'
+                )
             );
         } else if (category === 'rejected') {
             setRejectedQuestsSelected(true);
@@ -51,6 +56,31 @@ const QuestsPage = () => {
         return (task as UserTask).task !== undefined; // Check for the presence of 'task' property
     }
 
+    const applyForTaskAndUiUpdates = (taskId: string) => {
+        applyForTask(session.jwt, user.user.uid, taskId).then((data) => {
+            if (data.success) {
+                getAllUserTasks(session.jwt).then((data) => {
+                    setUserTasks(
+                        data.usertasks.filter((ut) => ut.uid === user.user.uid)
+                    );
+                    console.log(data);
+                });
+            }
+        });
+    };
+
+    const deleteUserTaskAndUpdateUi = (userTaskId: string) => {
+        deleteUserTask(session.jwt, userTaskId).then((data) => {
+            if (data.success) {
+                getAllUserTasks(session.jwt).then((data) => {
+                    setUserTasks(
+                        data.usertasks.filter((ut) => ut.uid === user.user.uid)
+                    );
+                });
+            }
+        });
+    };
+
     useEffect(() => {
         getAllUserTasks(session.jwt).then((data) => {
             setUserTasks(
@@ -61,18 +91,37 @@ const QuestsPage = () => {
     }, []);
 
     useEffect(() => {
-        getAllTasks(session.jwt).then((data) => {
-            console.log(data);
-            const tasks = data.tasks;
-            const filteredTasks = tasks.filter((task: Task) =>
-                userTasks.some(
-                    (userTask: UserTask) => userTask.task !== task.id
-                )
+        if (generalBoardSelected) {
+            getAllTasks(session.jwt).then((data) => {
+                console.log(data);
+
+                const tasks = data.tasks;
+                const assignedTaskIds = userTasks
+                    .filter((userTask) => userTask.uid === 'u0001')
+                    .map((userTask) => userTask.task);
+
+                // Filter the tasks to exclude those assigned to user u0001
+                const filteredTasks = tasks.filter(
+                    (task) => !assignedTaskIds.includes(task.id)
+                );
+
+                setGeneralBoardTasks(filteredTasks);
+                setResults(filteredTasks);
+                setAllTasks(data.tasks);
+            });
+        } else if (pendingQuestsSelected) {
+            const assignedTaskIds = userTasks
+                .filter((userTask) => userTask.uid === 'u0001')
+                .map((userTask) => userTask.task);
+
+            // Filter the tasks to exclude those assigned to user u0001
+            const filteredTasks = allTasks.filter(
+                (task) => !assignedTaskIds.includes(task.id)
             );
+
             setGeneralBoardTasks(filteredTasks);
-            setResults(filteredTasks);
-            setAllTasks(data.tasks);
-        });
+            setResults(userTasks);
+        }
     }, [userTasks]);
 
     return (
@@ -91,12 +140,12 @@ const QuestsPage = () => {
                         </button>
                         <button
                             className={`${
-                                assignedQuestsSelected
+                                pendingQuestsSelected
                                     ? '!text-blue underline'
                                     : ''
                             }`}
-                            onClick={() => handleSelection('assignedQuests')}>
-                            Assigned Quests
+                            onClick={() => handleSelection('pendingQuests')}>
+                            Pending Quests
                         </button>
                         <button
                             className={`${
@@ -132,8 +181,8 @@ const QuestsPage = () => {
                                 <p className="text-dark-grey font-medium">
                                     {generalBoardSelected
                                         ? 'There are currently no quests available.'
-                                        : assignedQuestsSelected
-                                        ? 'You do not have any assigned quests at the moment.'
+                                        : pendingQuestsSelected
+                                        ? 'You do not have any pending quests at the moment.'
                                         : rejectedSelected
                                         ? 'You do not have any rejected quests.'
                                         : null}
@@ -184,22 +233,44 @@ const QuestsPage = () => {
                                                   })}
                                         </p>
                                         {generalBoardSelected ? (
-                                            <button className="bg-blue px-4 py-2 font-semibold rounded-xl text-white">
+                                            <button
+                                                className="bg-blue px-4 py-2 font-semibold rounded-xl text-white"
+                                                onClick={() =>
+                                                    isUserTask(task)
+                                                        ? applyForTaskAndUiUpdates(
+                                                              task.task
+                                                          )
+                                                        : applyForTaskAndUiUpdates(
+                                                              task.id
+                                                          )
+                                                }>
                                                 APPLY
                                             </button>
-                                        ) : assignedQuestsSelected ? (
-                                            <p className="bg-yellow px-4 py-2 font-semibold rounded-xl text-white">
-                                                {isUserTask(task)
-                                                    ? task.status
-                                                    : null}
-                                            </p>
+                                        ) : pendingQuestsSelected ? (
+                                            <>
+                                                {isUserTask(task) &&
+                                                task.status === 'APPLIED' ? (
+                                                    <button
+                                                        className="font-semibold text-white bg-dark-grey px-4 py-2 rounded-xl"
+                                                        onClick={() =>
+                                                            deleteUserTaskAndUpdateUi(
+                                                                task.id
+                                                            )
+                                                        }>
+                                                        APPLIED
+                                                    </button>
+                                                ) : (
+                                                    <p className="bg-yellow px-4 py-2 font-semibold rounded-xl text-white">
+                                                        {task.status}
+                                                    </p>
+                                                )}
+                                            </>
                                         ) : rejectedSelected ? (
                                             <p className="bg-red px-4 py-2 font-semibold rounded-xl text-white">
                                                 REJECTED
                                             </p>
                                         ) : null}
-                                        {index ===
-                                        generalBoardTasks.length - 1 ? null : (
+                                        {index === results.length - 1 ? null : (
                                             <div className="col-span-5 w-full">
                                                 <hr className="border-[1px] border-grey" />
                                             </div>

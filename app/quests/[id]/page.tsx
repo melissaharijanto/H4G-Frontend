@@ -1,11 +1,12 @@
 'use client';
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
-import { getAllTasks } from '@/lib/backend/tasks';
-import { getAllUserTasks } from '@/lib/backend/usertasks';
+import { applyForTask, getAllTasks } from '@/lib/backend/tasks';
+import { deleteUserTask, getAllUserTasks } from '@/lib/backend/usertasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -48,6 +49,29 @@ const IndividualQuestPage = () => {
         REJECTED: 'bg-red',
     };
 
+    const applyForTaskAndUiUpdate = (taskId: string) => {
+        applyForTask(session.jwt, user.user.uid, taskId).then((data) => {
+            if (data.success) {
+                setApplied(true);
+                getAllUserTasks(session.jwt).then((data) => {
+                    const filteredUserTask = data.usertasks.filter(
+                        (ut) => task.id === ut.task && ut.uid === user.user.uid
+                    );
+                    setUserTask(filteredUserTask[0]);
+                });
+            }
+        });
+    };
+
+    const deleteUserTaskAndUiUpdate = (userTaskId: string) => {
+        deleteUserTask(session.jwt, userTaskId).then((data) => {
+            if (data.success) {
+                setApplied(false);
+                setUserTask(undefined);
+            }
+        });
+    };
+
     useEffect(() => {
         getAllTasks(session.jwt).then((data) => {
             const specificTask: Task[] = data.tasks.filter((t) => t.id === id);
@@ -73,11 +97,11 @@ const IndividualQuestPage = () => {
             <PageWithNavbar>
                 <div className="font-inter p-8 flex-col flex gap-y-8">
                     <div>
-                        <a
+                        <Link
                             href="/quests"
                             className="text-blue underline font-medium px-4 py-2 rounded-xl hover:font-bold transition-all ease-in">
                             {'< Back'}
-                        </a>
+                        </Link>
                     </div>
                     <div className="bg-white p-8 shadow-custom rounded-xl flex flex-col gap-y-8 lg:gap-y-0 lg:flex-row lg:justify-between">
                         <div className="gap-y-8 flex flex-col">
@@ -109,12 +133,20 @@ const IndividualQuestPage = () => {
                             <div>
                                 {applied ? (
                                     <button
-                                        disabled
-                                        className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold">
+                                        className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold"
+                                        onClick={() =>
+                                            deleteUserTaskAndUiUpdate(
+                                                userTask!.id
+                                            )
+                                        }>
                                         APPLIED
                                     </button>
                                 ) : (
-                                    <button className="bg-blue rounded-xl text-white px-4 py-2 font-semibold">
+                                    <button
+                                        className="bg-blue rounded-xl text-white px-4 py-2 font-semibold"
+                                        onClick={() =>
+                                            applyForTaskAndUiUpdate(id)
+                                        }>
                                         APPLY
                                     </button>
                                 )}
