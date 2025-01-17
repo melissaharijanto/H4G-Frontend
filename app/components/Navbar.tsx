@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ProfileIcon from './icons/ProfileIcon';
 import SearchIcon from './icons/SearchIcon';
 import SearchBar from './SearchBar';
+import Link from 'next/link';
 
 const Navbar = () => {
     const [openSearchBar, setOpenSearchBar] = useState<boolean>(false);
@@ -19,9 +20,9 @@ const Navbar = () => {
             {!openSearchBar ? (
                 <>
                     <div className="text-blue font-bold font-inter flex gap-x-24 relative">
-                        <a href="/home">Home</a>
-                        <a href="/quests">Quests</a>
-                        <a href="/request">Request an Item</a>
+                        <Link href="/home">Home</Link>
+                        <Link href="/quests">Quests</Link>
+                        <Link href="/request">Request an Item</Link>
                     </div>
                     <div className="flex gap-x-12">
                         <button onClick={toggleSearchBar}>

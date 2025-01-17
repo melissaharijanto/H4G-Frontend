@@ -1,8 +1,6 @@
 'use client';
 
 import { useAppSelector, useAppStore } from '@/lib/hooks';
-import PageWithNavbar from '../components/PageWithNavbar';
-import ProductCard from '../components/ProductCard';
 import { jwtDecode } from 'jwt-decode';
 import { useEffect, useState } from 'react';
 import { setUser } from '@/lib/features/userSlice';
@@ -10,7 +8,6 @@ import { User } from '@/lib/types/User';
 import { Item } from '@/lib/types/Item';
 import { getUser } from '@/lib/backend/users';
 import { getAllItems } from '@/lib/backend/items';
-import ProtectedRoute from '../components/ProtectedRoute';
 import UserHome from './UserHome';
 import AdminHome from './AdminHome';
 
