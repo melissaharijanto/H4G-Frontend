@@ -208,19 +208,24 @@ const QuestsPage = () => {
                                         <a
                                             href={
                                                 isUserTask(task)
-                                                    ? `/quests/${taskData[0].id}`
+                                                    ? `/quests/${
+                                                          taskData![0].id
+                                                      }`
                                                     : `/quests/${task.id}`
                                             }
                                             className="!font-bold !text-blue underline">
                                             {isUserTask(task)
-                                                ? taskData[0].id
+                                                ? taskData![0].id
                                                 : task.id}
                                         </a>
-                                        <p>{task.name || taskData[0].name}</p>
+                                        <p>
+                                            {(task as Task).name ||
+                                                taskData![0].name}
+                                        </p>
                                         <p>
                                             {isUserTask(task)
                                                 ? new Date(
-                                                      taskData[0].deadline
+                                                      taskData![0].deadline
                                                   ).toLocaleString('en-SG', {
                                                       timeZone:
                                                           'Asia/Singapore',
