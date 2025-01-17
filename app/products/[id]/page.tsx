@@ -18,7 +18,7 @@ const ProductPage = () => {
     const session = useAppSelector((state) => state.session);
     const user = useAppSelector((state) => state.user);
 
-    const { id } = useParams();
+    const { id }: { id: string } = useParams();
 
     const incrementCount = () => {
         setCount((count) => count + 1);
