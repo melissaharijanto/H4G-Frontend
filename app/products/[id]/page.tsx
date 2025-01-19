@@ -2,7 +2,9 @@
 import PageWithNavbar from '@/app/components/PageWithNavbar';
 import ProtectedRoute from '@/app/components/ProtectedRoute';
 import { buyItem, getItemById, preorderItem } from '@/lib/backend/items';
-import { useAppSelector } from '@/lib/hooks';
+import { getUser } from '@/lib/backend/users';
+import { setUser } from '@/lib/features/userSlice';
+import { useAppSelector, useAppStore } from '@/lib/hooks';
 import { Item } from '@/lib/types/Item';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -17,6 +19,7 @@ const ProductPage = () => {
 
     const session = useAppSelector((state) => state.session);
     const user = useAppSelector((state) => state.user);
+    const store = useAppStore();
 
     const { id }: { id: string } = useParams();
 
@@ -42,6 +45,9 @@ const ProductPage = () => {
                         return;
                     } else {
                         setSuccessMessage('Transaction successful!');
+                        getUser(session.jwt, user.user.uid!).then((data) => {
+                            store.dispatch(setUser(data));
+                        });
                     }
                 })
                 .catch((error) => console.log(error));
