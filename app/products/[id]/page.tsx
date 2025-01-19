@@ -6,20 +6,22 @@ import { getUser } from '@/lib/backend/users';
 import { setUser } from '@/lib/features/userSlice';
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import { Item } from '@/lib/types/Item';
+import { User } from '@/lib/types/User';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 const ProductPage = () => {
+    const user: User = useAppSelector((state) => state.user);
+    const session = useAppSelector((state) => state.session);
+    const store = useAppStore();
+
     const [count, setCount] = useState<number>(0);
     const [item, setItem] = useState<Item>();
     const [disablePlusButton, setDisablePlusButton] = useState<boolean>(false);
     const [disableMinusButton, setDisableMinusButton] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-
-    const session = useAppSelector((state) => state.session);
-    const user = useAppSelector((state) => state.user);
-    const store = useAppStore();
+    const [currentUser, setCurrentUser] = useState<User>(user);
 
     const { id }: { id: string } = useParams();
 
@@ -48,6 +50,14 @@ const ProductPage = () => {
                         getUser(session.jwt, user.user.uid!).then((data) => {
                             store.dispatch(setUser(data));
                         });
+                        setCurrentUser((prevState) => ({
+                            ...prevState!,
+                            credit: prevState.credit - count * item!.price, // Update the stock property
+                        }));
+                        setItem((prevState) => ({
+                            ...prevState!,
+                            stock: prevState!.stock - 1, // Update the stock property
+                        }));
                     }
                 })
                 .catch((error) => console.log(error));
