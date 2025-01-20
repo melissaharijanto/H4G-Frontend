@@ -3,7 +3,10 @@
 This project is made for Developer Student Club's Hack4Good 2025, with the following problem statement:
 
 ```
-Design and develop a web-based Minimart and Voucher System for Muhammadiyah Welfare Home, enabling users to request products and earn vouchers, while providing admins with robust management and reporting tools. The system should ensure security, usability, and efficient transaction processing, with optional auction features.
+Design and develop a web-based Minimart and Voucher System for Muhammadiyah Welfare Home, 
+enabling users to request products and earn vouchers, while providing admins with robust 
+management and reporting tools. The system should ensure security, usability, and efficient 
+transaction processing, with optional auction features.
 
 ```
 
