@@ -14,5 +14,7 @@ transaction processing, with optional auction features.
 
 This repository contains the frontend code for the marketplace. This project is built with **Next.js**, **Tailwind CSS**, and **Redux**. The frontend is deployed in **Netlify**. Deployment link is [**mwh-marketplace.netlify.app**](https://mwh-marketplace.netlify.app).
 
+## Devpost Submission Link
 
+Click [here](https://devpost.com/software/h4g-2025-team-yfz)
 
