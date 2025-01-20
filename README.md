@@ -18,3 +18,7 @@ This repository contains the frontend code for the marketplace. This project is 
 
 Click [here](https://devpost.com/software/h4g-2025-team-yfz).
 
+## Sample Account Credentials
+
+Email: alice@example.com
+Password: alicepass
