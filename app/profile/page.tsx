@@ -214,7 +214,9 @@ const Profile = () => {
                                                 {index + 1}.
                                             </p>
                                             <p className="font-inter">
-                                                {trx.id}
+                                                {trx.id.length > 6
+                                                    ? `${trx.id.slice(0, 6)}...`
+                                                    : trx.id}
                                             </p>
                                             <a
                                                 href={`/products/${trx.item}`}
