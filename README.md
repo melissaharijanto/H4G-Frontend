@@ -16,5 +16,5 @@ This repository contains the frontend code for the marketplace. This project is 
 
 ## Devpost Submission Link
 
-Click [here](https://devpost.com/software/h4g-2025-team-yfz)
+Click [here](https://devpost.com/software/h4g-2025-team-yfz).
 
