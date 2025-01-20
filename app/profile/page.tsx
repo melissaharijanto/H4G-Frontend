@@ -127,7 +127,7 @@ const Profile = () => {
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
                                 <p className="text-center">No.</p>
-                                <p className="text-center">Quest ID</p>
+                                <p className="text-center">Quest Name</p>
                                 <p className="text-center">Status</p>
                                 <p className="text-center">End Date</p>
                                 <div className="w-full col-span-4">
@@ -138,8 +138,15 @@ const Profile = () => {
                                 const taskData = allTasks.filter(
                                     (filteredTask) =>
                                         filteredTask.id === task.task &&
-                                        task.status === 'ONGOING'
+                                        (task.status === 'ONGOING' ||
+                                            task.status == 'APPLIED') &&
+                                        task.uid == user.user.uid
                                 );
+
+                                if (taskData.length == 0) {
+                                    return null;
+                                }
+
                                 return (
                                     <div
                                         className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
