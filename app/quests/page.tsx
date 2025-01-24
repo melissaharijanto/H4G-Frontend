@@ -97,7 +97,7 @@ const QuestsPage = () => {
 
                 const tasks = data.tasks;
                 const assignedTaskIds = userTasks
-                    .filter((userTask) => userTask.uid === 'u0001')
+                    .filter((userTask) => userTask.uid === user.user.uid)
                     .map((userTask) => userTask.task);
 
                 // Filter the tasks to exclude those assigned to user u0001
