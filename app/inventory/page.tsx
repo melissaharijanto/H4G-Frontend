@@ -5,16 +5,26 @@ import SearchIcon from '../components/icons/SearchIcon';
 import { useEffect, useState } from 'react';
 import { getAllItems } from '@/lib/backend/items';
 import { Item } from '@/lib/types/Item';
+import AvailableItemsTable from '../components/inventory/AvailableItemsTable';
+import OrdersTable from '../components/inventory/OrdersTable';
+import { Transaction } from '@/lib/types/Transaction';
+import { getAllTransactions } from '@/lib/backend/transactions';
 
 const Inventory = () => {
     const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
 
     const [items, setAllItems] = useState<Item[]>([]);
+    const [orders, setAllOrders] = useState<Transaction[]>([]);
 
     useEffect(() => {
         getAllItems(session.jwt).then((data) => {
             setAllItems(data.items);
+        });
+
+        getAllTransactions(session.jwt).then((data) => {
+            console.log(data.transactions);
+            setAllOrders(data.transactions);
         });
     }, []);
 
@@ -36,75 +46,8 @@ const Inventory = () => {
                 <p className="font-inter text-blue font-bold tracking-tight text-5xl">
                     Inventory
                 </p>
-                <div className="flex-col flex gap-y-4">
-                    <p className="font-inter text-blue font-bold tracking-tight text-3xl">
-                        All Available Items
-                    </p>
-                    <div className="bg-white rounded-xl justify-center shadow-custom p-8">
-                        <div className="font-inter flex flex-col w-full rounded-2xl gap-y-4">
-                            <div className="bg-grey w-full p-4 rounded-xl">
-                                <div className="bg-white flex justify-center items-center rounded-lg relative p-2 w-full">
-                                    <SearchIcon
-                                        strokeColor="stroke-dark-grey"
-                                        width="w-4"
-                                        className="absolute right-0"
-                                    />
-                                    <input
-                                        className="text-sm w-full bg-none focus:outline-none text-black ml-2"
-                                        placeholder="Enter your search query here."
-                                    />
-                                </div>
-                            </div>
-                            <div className="border-[1px] border-grey rounded-xl">
-                                <div className="w-full bg-input rounded-t-xl shadow-sm flex items-center text-black">
-                                    <div className="w-full grid grid-cols-[1fr_2fr_3fr_2fr_2fr] w-full font-semibold  flex text-center items-center">
-                                        <button className="p-4">Item ID</button>
-                                        <button className="p-4">Name</button>
-                                        <button className="p-4">
-                                            Description
-                                        </button>
-                                        <button className="p-4">
-                                            Price (in Credits)
-                                        </button>
-                                        <button className="p-4">Stock</button>
-                                    </div>
-                                </div>
-                                {items.map((item, index) => {
-                                    return (
-                                        <div
-                                            className="grid grid-cols-[1fr_2fr_3fr_2fr_2fr] font-medium font-inter place-items-center text-black text-center gap-y-1"
-                                            key={item.id}>
-                                            <p className="p-4">{item.id}</p>
-
-                                            <p className="p-4">{item.name}</p>
-
-                                            <p className="p-4">
-                                                {`${item.description.slice(
-                                                    0,
-                                                    25
-                                                )}${
-                                                    item.description.length > 25
-                                                        ? '...'
-                                                        : ''
-                                                }`}
-                                            </p>
-
-                                            <p className="p-4">{item.price}</p>
-
-                                            <p className="p-4">{item.stock}</p>
-                                            {index ===
-                                            items.length - 1 ? null : (
-                                                <div className="col-span-5 w-full">
-                                                    <hr className="w-full border-grey" />
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <AvailableItemsTable items={items} />
+                <OrdersTable orders={orders} />
                 <div className="flex flex-col gap-y-4">
                     <p className="font-inter text-blue font-bold tracking-tight text-3xl">
                         Orders
