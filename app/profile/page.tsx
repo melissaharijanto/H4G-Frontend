@@ -14,6 +14,16 @@ const Profile = () => {
     const session = useAppSelector((state) => state.session);
     const store = useAppStore();
 
+    const statusColorDict: { [key: string]: string } = {
+        APPLIED: 'bg-dark-grey',
+        ONGOING: 'bg-yellow',
+        UNDER_REVIEW: 'bg-yellow',
+        REQUEST_RESUBMISSION: 'bg-yellow',
+        COMPLETED: 'bg-green',
+        REJECTED: 'bg-red',
+        CONFIRMED: 'bg-green',
+    };
+
     const {
         data: uts,
         isLoading: isUtsLoading,
@@ -158,7 +168,10 @@ const Profile = () => {
                                             {taskData && taskData[0].name}
                                         </p>
                                         <p className="font-inter">
-                                            <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                            <span
+                                                className={`font-inter !font-bold ${
+                                                    statusColorDict[task.status]
+                                                } text-white px-2 py-1 rounded-md text-sm`}>
                                                 {task.status}
                                             </span>
                                         </p>
@@ -228,7 +241,12 @@ const Profile = () => {
                                                 {trx.quantity}
                                             </p>
                                             <p className="font-inter">
-                                                <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                                <span
+                                                    className={`font-inter !font-bold ${
+                                                        statusColorDict[
+                                                            trx.status
+                                                        ]
+                                                    } text-white px-2 py-1 rounded-md text-sm`}>
                                                     {trx.status}
                                                 </span>
                                             </p>
@@ -333,7 +351,10 @@ const Profile = () => {
                                             {trx.quantity}
                                         </p>
                                         <p className="font-inter">
-                                            <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                            <span
+                                                className={`font-inter !font-bold ${
+                                                    statusColorDict[trx.status]
+                                                } text-white px-2 py-1 rounded-md text-sm`}>
                                                 {trx.status}
                                             </span>
                                         </p>
@@ -443,7 +464,12 @@ const Profile = () => {
                                                 {taskData && taskData[0].name}
                                             </p>
                                             <p className="font-inter">
-                                                <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                                <span
+                                                    className={`font-inter !font-bold ${
+                                                        statusColorDict[
+                                                            task.status
+                                                        ]
+                                                    } text-white px-2 py-1 rounded-md text-sm`}>
                                                     {task.status}
                                                 </span>
                                             </p>
