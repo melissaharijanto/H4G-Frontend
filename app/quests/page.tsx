@@ -8,6 +8,7 @@ import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
 import { deleteUserTask, getAllUserTasks } from '@/lib/backend/usertasks';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const QuestsPage = () => {
     const [generalBoardSelected, setGeneralBoardSelected] =
@@ -18,111 +19,143 @@ const QuestsPage = () => {
         useState<boolean>(false);
     const [results, setResults] = useState<Task[] | UserTask[]>([]);
     const [generalBoardTasks, setGeneralBoardTasks] = useState<Task[]>([]);
-    const [userTasks, setUserTasks] = useState<UserTask[]>([]);
     const [allTasks, setAllTasks] = useState<Task[]>([]);
 
     const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
 
+    // Fetch user tasks using react-query
+    const { data: userTasksData, refetch: refetchUserTasks } = useQuery({
+        queryKey: ['userTasks'],
+        queryFn: () => getAllUserTasks(session.jwt),
+        enabled: !!session.jwt, // Only run the query if there's a valid JWT session
+    });
+
+    // Fetch all tasks using react-query
+    const { data: allTasksData, refetch: refetchAllTasks } = useQuery({
+        queryKey: ['allTasks'],
+        queryFn: () => getAllTasks(session.jwt),
+        enabled: !!session.jwt,
+    });
+
+    const applyForTaskMutation = useMutation({
+        mutationFn: (taskId: string) =>
+            applyForTask(session.jwt, user.user.uid, taskId),
+        onMutate: async (taskId: string) => {
+            const previousResults = [...results];
+
+            setResults((oldResults) => {
+                if (oldResults.length > 0 && 'name' in oldResults[0]) {
+                    return (oldResults as Task[]).filter(
+                        (task) => task.id !== taskId
+                    );
+                }
+                return oldResults;
+            });
+
+            return { previousResults };
+        },
+        onSuccess: () => {
+            refetchUserTasks();
+        },
+    });
+
+    const deleteUserTaskMutation = useMutation({
+        mutationFn: (userTaskId: string) =>
+            deleteUserTask(session.jwt, userTaskId),
+        onMutate: async (userTaskId: string) => {
+            const previousResults = [...results];
+
+            setResults((oldResults) => {
+                if (oldResults.length > 0 && 'task' in oldResults[0]) {
+                    return (oldResults as UserTask[]).filter(
+                        (task) => task.id !== userTaskId
+                    );
+                }
+                return oldResults;
+            });
+
+            return { previousResults };
+        },
+        onSuccess: () => {
+            refetchUserTasks();
+        },
+    });
+
     const handleSelection = (category: string) => {
-        // Reset all categories to false
         setGeneralBoardSelected(false);
         setPendingQuestsSelected(false);
         setRejectedQuestsSelected(false);
 
-        // Set the selected category to true
         if (category === 'generalBoard') {
             setGeneralBoardSelected(true);
             setResults(generalBoardTasks);
         } else if (category === 'pendingQuests') {
             setPendingQuestsSelected(true);
             setResults(
-                userTasks.filter(
+                userTasksData?.usertasks.filter(
                     (task: UserTask) =>
-                        task.status === 'APPLIED' ||
-                        task.status === 'ONGOING' ||
-                        task.status === 'UNDER_REVIEW'
-                )
+                        (task.status === 'APPLIED' ||
+                            task.status === 'ONGOING' ||
+                            task.status === 'UNDER_REVIEW') &&
+                        task.uid === user.user.uid
+                ) || []
             );
         } else if (category === 'rejected') {
             setRejectedQuestsSelected(true);
             setResults(
-                userTasks.filter((task: UserTask) => task.status === 'REJECTED')
+                userTasksData?.usertasks.filter(
+                    (task: UserTask) =>
+                        task.status === 'REJECTED' && task.uid === user.user.uid
+                ) || []
             );
         }
     };
 
     function isUserTask(task: Task | UserTask): task is UserTask {
-        return (task as UserTask).task !== undefined; // Check for the presence of 'task' property
+        return (task as UserTask).task !== undefined;
     }
 
     const applyForTaskAndUiUpdates = (taskId: string) => {
-        applyForTask(session.jwt, user.user.uid, taskId).then((data) => {
-            if (data.success) {
-                getAllUserTasks(session.jwt).then((data) => {
-                    setUserTasks(
-                        data.usertasks.filter((ut) => ut.uid === user.user.uid)
-                    );
-                    console.log(data);
-                });
-            }
-        });
+        applyForTaskMutation.mutate(taskId);
     };
 
     const deleteUserTaskAndUpdateUi = (userTaskId: string) => {
-        deleteUserTask(session.jwt, userTaskId).then((data) => {
-            if (data.success) {
-                getAllUserTasks(session.jwt).then((data) => {
-                    setUserTasks(
-                        data.usertasks.filter((ut) => ut.uid === user.user.uid)
-                    );
-                });
-            }
-        });
+        deleteUserTaskMutation.mutate(userTaskId);
     };
 
     useEffect(() => {
-        getAllUserTasks(session.jwt).then((data) => {
-            setUserTasks(
-                data.usertasks.filter((ut) => ut.uid === user.user.uid)
-            );
-            console.log(data);
-        });
-    }, []);
-
-    useEffect(() => {
-        if (generalBoardSelected) {
-            getAllTasks(session.jwt).then((data) => {
-                console.log(data);
-
-                const tasks = data.tasks;
-                const assignedTaskIds = userTasks
-                    .filter((userTask) => userTask.uid === user.user.uid)
-                    .map((userTask) => userTask.task);
-
-                // Filter the tasks to exclude those assigned to user u0001
-                const filteredTasks = tasks.filter(
-                    (task) => !assignedTaskIds.includes(task.id)
-                );
-
-                setGeneralBoardTasks(filteredTasks);
-                setResults(filteredTasks);
-                setAllTasks(data.tasks);
-            });
-        } else if (pendingQuestsSelected) {
-            const assignedTaskIds = userTasks
-                .filter((userTask) => userTask.uid === 'u0001')
+        if (generalBoardSelected && allTasksData && userTasksData) {
+            const tasks = allTasksData.tasks;
+            const assignedTaskIds = userTasksData.usertasks
+                .filter((userTask) => userTask.uid === user.user.uid)
                 .map((userTask) => userTask.task);
 
-            // Filter the tasks to exclude those assigned to user u0001
-            const filteredTasks = allTasks.filter(
+            const filteredTasks = tasks.filter(
                 (task) => !assignedTaskIds.includes(task.id)
             );
 
             setGeneralBoardTasks(filteredTasks);
-            setResults(userTasks);
+            setResults(filteredTasks);
+            setAllTasks(tasks);
+        } else if (pendingQuestsSelected && userTasksData) {
+            const pendingTasks = userTasksData.usertasks.filter(
+                (userTask) =>
+                    userTask.uid === user.user.uid &&
+                    (userTask.status === 'APPLIED' ||
+                        userTask.status === 'ONGOING' ||
+                        userTask.status === 'UNDER_REVIEW')
+            );
+            setResults(pendingTasks);
+        } else if (rejectedSelected && userTasksData) {
+            const rejectedTasks = userTasksData.usertasks.filter(
+                (userTask) =>
+                    userTask.uid === user.user.uid &&
+                    userTask.status === 'REJECTED'
+            );
+            setResults(rejectedTasks);
         }
-    }, [userTasks]);
+    }, [generalBoardSelected, pendingQuestsSelected, allTasksData]);
 
     return (
         <ProtectedRoute>
