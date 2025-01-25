@@ -1,21 +1,46 @@
 'use client';
 import { useAppSelector, useAppStore } from '@/lib/hooks';
 import PageWithNavbar from '../components/PageWithNavbar';
-import { useEffect, useState } from 'react';
 import { getAllTasks } from '@/lib/backend/tasks';
 import { UserTask } from '@/lib/types/UserTask';
 import { clearUser } from '@/lib/features/userSlice';
 import { clearJwt } from '@/lib/features/sessionSlice';
-import { Task } from '@/lib/types/Task';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { getAllUserTasks } from '@/lib/backend/usertasks';
+import { useQuery } from '@tanstack/react-query';
 
 const Profile = () => {
     const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
     const store = useAppStore();
-    const [userTasks, setUserTasks] = useState<UserTask[]>([]);
-    const [allTasks, setAllTasks] = useState<Task[]>([]);
+
+    const statusColorDict: { [key: string]: string } = {
+        APPLIED: 'bg-dark-grey',
+        ONGOING: 'bg-yellow',
+        UNDER_REVIEW: 'bg-yellow',
+        REQUEST_RESUBMISSION: 'bg-yellow',
+        COMPLETED: 'bg-green',
+        REJECTED: 'bg-red',
+        CONFIRMED: 'bg-green',
+    };
+
+    const {
+        data: uts,
+        isLoading: isUtsLoading,
+        error: utsError,
+    } = useQuery({
+        queryKey: ['userTasks'],
+        queryFn: () => getAllUserTasks(session.jwt),
+    });
+
+    const {
+        data: ts,
+        isLoading: areTasksLoading,
+        error: tasksError,
+    } = useQuery({
+        queryKey: ['tasks'],
+        queryFn: () => getAllTasks(session.jwt),
+    });
 
     const convertGMTToSGT = (gmtDateString: string) => {
         // Parse the GMT date string into a Date object in UTC (GMT)
@@ -27,22 +52,6 @@ const Profile = () => {
 
         return sgtFormatted;
     };
-
-    useEffect(() => {
-        getAllUserTasks(session.jwt).then((data) => {
-            console.log(data);
-            setUserTasks(
-                data.usertasks.filter((ut) => ut.uid === user.user.uid)
-            );
-        });
-
-        getAllTasks(session.jwt).then((data) => {
-            console.log(data);
-            setAllTasks(data.tasks);
-        });
-
-        console.log(user.transactions);
-    }, []);
 
     const logOut = () => {
         // redirect('/');
@@ -89,8 +98,9 @@ const Profile = () => {
                             <div className="w-40 h-40 bg-gradient-to-b from-yellow to-light-yellow rounded-xl flex flex-col justify-center items-center shadow-lg">
                                 <p className="font-inter text-4xl font-bold text-white">
                                     {
-                                        userTasks.filter(
-                                            (task) => task.uid === user.user.uid
+                                        uts?.usertasks.filter(
+                                            (task: UserTask) =>
+                                                task.uid === user.user.uid
                                         ).length
                                     }
                                 </p>
@@ -122,11 +132,11 @@ const Profile = () => {
                                 Your Ongoing Quests
                             </h2>
 
-                            <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black p-2 text-center gap-y-2 font-bold place-items-center">
+                            <div className="grid grid-cols-[2fr_3fr_2fr_3fr] text-black p-2 text-center gap-y-2 font-bold place-items-center">
                                 <div className="w-full col-span-4">
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
-                                <p className="text-center">No.</p>
+                                <p className="text-center">Quest ID</p>
                                 <p className="text-center">Quest Name</p>
                                 <p className="text-center">Status</p>
                                 <p className="text-center">End Date</p>
@@ -134,8 +144,8 @@ const Profile = () => {
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
                             </div>
-                            {userTasks.slice(0, 5).map((task, index) => {
-                                const taskData = allTasks.filter(
+                            {uts?.usertasks.slice(0, 5).map((task, index) => {
+                                const taskData = ts?.tasks.filter(
                                     (filteredTask) =>
                                         filteredTask.id === task.task &&
                                         (task.status === 'ONGOING' ||
@@ -143,29 +153,33 @@ const Profile = () => {
                                         task.uid == user.user.uid
                                 );
 
-                                if (taskData.length == 0) {
+                                if (taskData && taskData.length == 0) {
                                     return null;
                                 }
 
                                 return (
                                     <div
-                                        className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
+                                        className="grid grid-cols-[2fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
                                         key={task.id}>
                                         <p className="font-inter">
-                                            {index + 1}.
+                                            {taskData && taskData[0].id}
                                         </p>
                                         <p className="font-inter">
-                                            {taskData[0]?.name}
+                                            {taskData && taskData[0].name}
                                         </p>
                                         <p className="font-inter">
-                                            <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                            <span
+                                                className={`font-inter !font-bold ${
+                                                    statusColorDict[task.status]
+                                                } text-white px-2 py-1 rounded-md text-sm`}>
                                                 {task.status}
                                             </span>
                                         </p>
                                         <p className="font-inter">
-                                            {convertGMTToSGT(
-                                                taskData[0]?.deadline
-                                            )}
+                                            {taskData &&
+                                                convertGMTToSGT(
+                                                    taskData[0].deadline!.toLocaleString()
+                                                )}
                                         </p>
                                         <div className="w-full col-span-4">
                                             <hr className="w-full border-[1px] border-grey" />
@@ -227,7 +241,12 @@ const Profile = () => {
                                                 {trx.quantity}
                                             </p>
                                             <p className="font-inter">
-                                                <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                                <span
+                                                    className={`font-inter !font-bold ${
+                                                        statusColorDict[
+                                                            trx.status
+                                                        ]
+                                                    } text-white px-2 py-1 rounded-md text-sm`}>
                                                     {trx.status}
                                                 </span>
                                             </p>
@@ -332,7 +351,10 @@ const Profile = () => {
                                             {trx.quantity}
                                         </p>
                                         <p className="font-inter">
-                                            <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
+                                            <span
+                                                className={`font-inter !font-bold ${
+                                                    statusColorDict[trx.status]
+                                                } text-white px-2 py-1 rounded-md text-sm`}>
                                                 {trx.status}
                                             </span>
                                         </p>
@@ -354,8 +376,8 @@ const Profile = () => {
                                 <div className="w-40 h-40 bg-gradient-to-b from-red to-light-red rounded-xl flex flex-col justify-center items-center shadow-lg">
                                     <p className="font-inter text-4xl font-bold text-white">
                                         {
-                                            userTasks.filter((userTask) =>
-                                                allTasks.some(
+                                            uts?.usertasks.filter((userTask) =>
+                                                ts?.tasks.some(
                                                     (task) =>
                                                         task.id ===
                                                             userTask.task &&
@@ -372,32 +394,28 @@ const Profile = () => {
                                 <div className="w-40 h-40 bg-gradient-to-b from-orange-400 to-orange-300 rounded-xl flex flex-col justify-center items-center shadow-lg">
                                     <p className="font-inter text-4xl font-bold text-white">
                                         {
-                                            userTasks.filter((userTask) =>
-                                                allTasks.some(
-                                                    (task) =>
-                                                        task.id ===
-                                                            userTask.task &&
-                                                        userTask.status ===
-                                                            'ONGOING'
-                                                )
+                                            uts?.usertasks.filter(
+                                                (ut) =>
+                                                    ut.uid === user.user.uid &&
+                                                    (ut.status === 'ONGOING' ||
+                                                        ut.status ===
+                                                            'APPLIED' ||
+                                                        ut.status ===
+                                                            'UNDER_REVIEW')
                                             ).length
                                         }
                                     </p>
                                     <p className="font-inter text-md text-white font-semibold mt-2">
-                                        Pending Quests
+                                        Ongoing Quests
                                     </p>
                                 </div>
                                 <div className="w-40 h-40 bg-gradient-to-b from-green to-light-green rounded-xl flex flex-col justify-center items-center shadow-lg">
                                     <p className="font-inter text-4xl font-bold text-white">
                                         {
-                                            userTasks.filter((userTask) =>
-                                                allTasks.some(
-                                                    (task) =>
-                                                        task.id ===
-                                                            userTask.task &&
-                                                        userTask.status ===
-                                                            'COMPLETED'
-                                                )
+                                            uts?.usertasks.filter(
+                                                (ut) =>
+                                                    ut.uid === user.user.uid &&
+                                                    ut.status === 'CLAIMED'
                                             ).length
                                         }
                                     </p>
@@ -406,49 +424,67 @@ const Profile = () => {
                                     </p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center  p-2  gap-y-2 font-bold place-items-center mt-8">
-                                <div className="w-full col-span-4">
+                            <div className="grid grid-cols-[1fr_2fr_3fr_2fr_3fr] text-black text-center  p-2  gap-y-2 font-bold place-items-center mt-8">
+                                <div className="w-full col-span-5">
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
                                 <p className="text-center">No.</p>
                                 <p className="text-center">Quest ID</p>
+                                <p className="text-center">Quest Name</p>
                                 <p className="text-center">Status</p>
                                 <p className="text-center">End Date</p>
-                                <div className="w-full col-span-4">
+                                <div className="w-full col-span-5">
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
                             </div>
-                            {userTasks.map((task, index) => {
-                                const taskData = allTasks.filter(
-                                    (filteredTask) =>
-                                        filteredTask.id === task.task
-                                );
-                                return (
-                                    <div
-                                        className="grid grid-cols-[1fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
-                                        key={task.id}>
-                                        <p className="font-inter">
-                                            {index + 1}.
-                                        </p>
-                                        <p className="font-inter">
-                                            {taskData[0]?.name}
-                                        </p>
-                                        <p className="font-inter">
-                                            <span className="font-inter !font-bold bg-orange-300 text-white px-2 py-1 rounded-md text-sm">
-                                                {task.status}
-                                            </span>
-                                        </p>
-                                        <p className="font-inter">
-                                            {convertGMTToSGT(
-                                                taskData[0]?.deadline
-                                            )}
-                                        </p>
-                                        <div className="w-full col-span-4">
-                                            <hr className="w-full border-[1px] border-grey" />
+                            {uts?.usertasks
+                                .filter((ut) => ut.uid === user.user.uid)
+                                .map((task, index) => {
+                                    const taskData = ts?.tasks.filter(
+                                        (filteredTask) =>
+                                            filteredTask.id === task.task
+                                    );
+                                    return (
+                                        <div
+                                            className="grid grid-cols-[1fr_2fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
+                                            key={task.id}>
+                                            <p className="font-inter">
+                                                {index + 1}.
+                                            </p>
+                                            <a
+                                                href={
+                                                    taskData
+                                                        ? `quests/${taskData[0].id}`
+                                                        : ''
+                                                }
+                                                className="font-inter text-blue underline">
+                                                {taskData && taskData[0].id}
+                                            </a>
+                                            <p className="font-inter">
+                                                {taskData && taskData[0].name}
+                                            </p>
+                                            <p className="font-inter">
+                                                <span
+                                                    className={`font-inter !font-bold ${
+                                                        statusColorDict[
+                                                            task.status
+                                                        ]
+                                                    } text-white px-2 py-1 rounded-md text-sm`}>
+                                                    {task.status}
+                                                </span>
+                                            </p>
+                                            <p className="font-inter">
+                                                {taskData &&
+                                                    convertGMTToSGT(
+                                                        taskData[0].deadline!.toLocaleString()
+                                                    )}
+                                            </p>
+                                            <div className="w-full col-span-5">
+                                                <hr className="w-full border-[1px] border-grey" />
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
                         </div>
                     </div>
                 </div>

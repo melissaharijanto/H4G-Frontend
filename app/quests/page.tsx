@@ -171,8 +171,8 @@ const QuestsPage = () => {
                     <div className="border-2 border-grey rounded-xl text-center">
                         <div className="grid grid-cols-[1fr_2fr_2fr_2fr_2fr] py-4 text-black font-bold place-items-center bg-input rounded-t-xl">
                             <p>No.</p>
-                            <p>Task ID</p>
-                            <p>Task Name</p>
+                            <p>Quest ID</p>
+                            <p>Quest Name</p>
                             <p>Deadline</p>
                             <p>Status</p>
                         </div>
