@@ -6,21 +6,22 @@ import { deleteUserTask, getAllUserTasks } from '@/lib/backend/usertasks';
 import { useAppSelector } from '@/lib/hooks';
 import { Task } from '@/lib/types/Task';
 import { UserTask } from '@/lib/types/UserTask';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 const IndividualQuestPage = () => {
     const { id }: { id: string } = useParams();
 
-    const [task, setTask] = useState<Task>();
-    const [userTask, setUserTask] = useState<UserTask>();
-    const [applied, setApplied] = useState<boolean>(false);
-
     const user = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
 
-    const convertGMTToSGT = (gmtDateString: string) => {
+    const queryClient = useQueryClient();
+
+    const convertGMTToSGT = (gmtDateString: Date | null | undefined) => {
+        if (!gmtDateString) {
+            return 'N/A';
+        }
         // Parse the GMT date string into a Date object in UTC (GMT)
         const gmtDate = new Date(gmtDateString);
         // Format the date to SGT using the correct timezone (Asia/Singapore)
@@ -49,48 +50,69 @@ const IndividualQuestPage = () => {
         REJECTED: 'bg-red',
     };
 
-    const applyForTaskAndUiUpdate = (taskId: string) => {
-        applyForTask(session.jwt, user.user.uid, taskId).then((data) => {
-            if (data.success) {
-                setApplied(true);
-                getAllUserTasks(session.jwt).then((data) => {
-                    const filteredUserTask = data.usertasks.filter(
-                        (ut) => task!.id === ut.task && ut.uid === user.user.uid
-                    );
-                    setUserTask(filteredUserTask[0]);
-                });
-            }
-        });
-    };
+    const { data: task, isLoading: taskLoading } = useQuery({
+        queryKey: ['allTasks', id],
+        queryFn: () =>
+            getAllTasks(session.jwt).then((data) => {
+                const specificTask: Task = data.tasks.find((t) => t.id === id)!;
+                return specificTask;
+            }),
+    });
 
-    const deleteUserTaskAndUiUpdate = (userTaskId: string) => {
-        deleteUserTask(session.jwt, userTaskId).then((data) => {
-            if (data.success) {
-                setApplied(false);
-                setUserTask(undefined);
-            }
+    const { data: userTask, isLoading: userTaskLoading } =
+        useQuery<UserTask | null>({
+            queryKey: ['userTask', id, user.user.uid],
+            queryFn: async () => {
+                const data = await getAllUserTasks(session.jwt);
+                const ut =
+                    data.usertasks.find(
+                        (ut: UserTask) =>
+                            ut.task === id && ut.uid === user.user.uid
+                    ) || null;
+                return ut;
+            },
+            enabled: !!id && !!user.user.uid, // Only run if `id` & `user.user.uid` exist
         });
-    };
 
-    useEffect(() => {
-        getAllTasks(session.jwt).then((data) => {
-            const specificTask: Task[] = data.tasks.filter((t) => t.id === id);
-            setTask(specificTask[0]);
-        });
-    }, []);
+    const applyMutation = useMutation({
+        mutationFn: () => applyForTask(session.jwt, user.user.uid, id),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['userTask', id, user.user.uid],
+            });
+        },
+    });
 
-    useEffect(() => {
-        getAllUserTasks(session.jwt).then((data) => {
-            console.log(data.usertasks);
-            const specificUserTask = data.usertasks.filter(
-                (ut: UserTask) => ut.task == id && ut.uid === user.user.uid
-            );
-            if (specificUserTask.length > 0) {
-                setApplied(true);
-                setUserTask(specificUserTask[0]);
-            }
-        });
-    }, [task]);
+    const deleteMutation = useMutation({
+        mutationFn: () => deleteUserTask(session.jwt, userTask!.id),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: ['userTask', id, user.user.uid],
+            });
+        },
+    });
+
+    if (taskLoading || userTaskLoading)
+        return (
+            <ProtectedRoute>
+                <PageWithNavbar>
+                    <p>Loading...</p>
+                </PageWithNavbar>
+            </ProtectedRoute>
+        );
+
+    // useEffect(() => {
+    //     getAllUserTasks(session.jwt).then((data) => {
+    //         console.log(data.usertasks);
+    //         const specificUserTask = data.usertasks.filter(
+    //             (ut: UserTask) => ut.task == id && ut.uid === user.user.uid
+    //         );
+    //         if (specificUserTask.length > 0) {
+    //             setApplied(true);
+    //             setUserTask(specificUserTask[0]);
+    //         }
+    //     });
+    // }, [specificTask]);
 
     return (
         <ProtectedRoute>
@@ -131,23 +153,23 @@ const IndividualQuestPage = () => {
                                 </p>
                             </div>
                             <div>
-                                {applied ? (
+                                {userTask ? (
                                     <button
                                         className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold"
-                                        onClick={() =>
-                                            deleteUserTaskAndUiUpdate(
-                                                userTask!.id
-                                            )
-                                        }>
-                                        APPLIED
+                                        onClick={() => deleteMutation.mutate()}
+                                        disabled={deleteMutation.isPending}>
+                                        {deleteMutation.isPending
+                                            ? 'Removing...'
+                                            : 'APPLIED'}
                                     </button>
                                 ) : (
                                     <button
                                         className="bg-blue rounded-xl text-white px-4 py-2 font-semibold"
-                                        onClick={() =>
-                                            applyForTaskAndUiUpdate(id)
-                                        }>
-                                        APPLY
+                                        onClick={() => applyMutation.mutate()}
+                                        disabled={applyMutation.isPending}>
+                                        {applyMutation.isPending
+                                            ? 'Applying...'
+                                            : 'APPLY'}
                                     </button>
                                 )}
                             </div>
