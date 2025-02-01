@@ -157,9 +157,12 @@ const IndividualQuestPage = () => {
                                     <button
                                         className="bg-dark-grey text-white rounded-xl px-4 py-2 font-semibold"
                                         onClick={() => deleteMutation.mutate()}
-                                        disabled={deleteMutation.isPending}>
+                                        disabled={
+                                            deleteMutation.isPending ||
+                                            userTask.status !== 'APPLIED'
+                                        }>
                                         {deleteMutation.isPending
-                                            ? 'Removing...'
+                                            ? 'REMOVING...'
                                             : 'APPLIED'}
                                     </button>
                                 ) : (
@@ -168,7 +171,7 @@ const IndividualQuestPage = () => {
                                         onClick={() => applyMutation.mutate()}
                                         disabled={applyMutation.isPending}>
                                         {applyMutation.isPending
-                                            ? 'Applying...'
+                                            ? 'APPLYING...'
                                             : 'APPLY'}
                                     </button>
                                 )}
