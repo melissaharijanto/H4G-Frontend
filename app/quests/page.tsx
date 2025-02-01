@@ -32,7 +32,7 @@ const QuestsPage = () => {
     });
 
     // Fetch all tasks using react-query
-    const { data: allTasksData, refetch: refetchAllTasks } = useQuery({
+    const { data: allTasksData } = useQuery({
         queryKey: ['allTasks'],
         queryFn: () => getAllTasks(session.jwt),
         enabled: !!session.jwt,
@@ -155,7 +155,14 @@ const QuestsPage = () => {
             );
             setResults(rejectedTasks);
         }
-    }, [generalBoardSelected, pendingQuestsSelected, allTasksData]);
+    }, [
+        generalBoardSelected,
+        pendingQuestsSelected,
+        allTasksData,
+        rejectedSelected,
+        user.user.uid,
+        userTasksData,
+    ]);
 
     return (
         <ProtectedRoute>
@@ -223,7 +230,7 @@ const QuestsPage = () => {
                             </div>
                         ) : (
                             results.map((task, index) => {
-                                let taskData: Task[];
+                                let taskData: Task[] = [];
                                 if (isUserTask(task)) {
                                     taskData = allTasks.filter(
                                         (generalTask) =>
@@ -258,13 +265,14 @@ const QuestsPage = () => {
                                         <p>
                                             {isUserTask(task)
                                                 ? new Date(
-                                                      taskData![0].deadline
+                                                      taskData?.[0]?.deadline ??
+                                                          ''
                                                   ).toLocaleString('en-SG', {
                                                       timeZone:
                                                           'Asia/Singapore',
                                                   })
                                                 : new Date(
-                                                      task.deadline
+                                                      task?.deadline ?? ''
                                                   ).toLocaleString('en-SG', {
                                                       timeZone:
                                                           'Asia/Singapore',
