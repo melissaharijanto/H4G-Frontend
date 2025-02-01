@@ -24,20 +24,12 @@ const Profile = () => {
         CONFIRMED: 'bg-green',
     };
 
-    const {
-        data: uts,
-        isLoading: isUtsLoading,
-        error: utsError,
-    } = useQuery({
+    const { data: uts } = useQuery({
         queryKey: ['userTasks'],
         queryFn: () => getAllUserTasks(session.jwt),
     });
 
-    const {
-        data: ts,
-        isLoading: areTasksLoading,
-        error: tasksError,
-    } = useQuery({
+    const { data: ts } = useQuery({
         queryKey: ['tasks'],
         queryFn: () => getAllTasks(session.jwt),
     });
@@ -144,49 +136,54 @@ const Profile = () => {
                                     <hr className="w-full border-[1px] border-grey" />
                                 </div>
                             </div>
-                            {uts?.usertasks.slice(0, 5).map((task, index) => {
-                                const taskData = ts?.tasks.filter(
-                                    (filteredTask) =>
-                                        filteredTask.id === task.task &&
-                                        (task.status === 'ONGOING' ||
-                                            task.status == 'APPLIED') &&
-                                        task.uid == user.user.uid
-                                );
+                            {uts?.usertasks
+                                .filter((task) => task.uid === user.user.uid)
+                                .slice(0, 5)
+                                .map((task) => {
+                                    const taskData = ts?.tasks.filter(
+                                        (filteredTask) =>
+                                            filteredTask.id === task.task &&
+                                            (task.status === 'ONGOING' ||
+                                                task.status == 'APPLIED') &&
+                                            task.uid === user.user.uid
+                                    );
 
-                                if (taskData && taskData.length == 0) {
-                                    return null;
-                                }
+                                    if (taskData && taskData.length == 0) {
+                                        return null;
+                                    }
 
-                                return (
-                                    <div
-                                        className="grid grid-cols-[2fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
-                                        key={task.id}>
-                                        <p className="font-inter">
-                                            {taskData && taskData[0].id}
-                                        </p>
-                                        <p className="font-inter">
-                                            {taskData && taskData[0].name}
-                                        </p>
-                                        <p className="font-inter">
-                                            <span
-                                                className={`font-inter !font-bold ${
-                                                    statusColorDict[task.status]
-                                                } text-white px-2 py-1 rounded-md text-sm`}>
-                                                {task.status}
-                                            </span>
-                                        </p>
-                                        <p className="font-inter">
-                                            {taskData &&
-                                                convertGMTToSGT(
-                                                    taskData[0].deadline!.toLocaleString()
-                                                )}
-                                        </p>
-                                        <div className="w-full col-span-4">
-                                            <hr className="w-full border-[1px] border-grey" />
+                                    return (
+                                        <div
+                                            className="grid grid-cols-[2fr_3fr_2fr_3fr] text-black text-center gap-y-2 p-2 font-medium place-items-center"
+                                            key={task.id}>
+                                            <p className="font-inter">
+                                                {taskData && taskData[0].id}
+                                            </p>
+                                            <p className="font-inter">
+                                                {taskData && taskData[0].name}
+                                            </p>
+                                            <p className="font-inter">
+                                                <span
+                                                    className={`font-inter !font-bold ${
+                                                        statusColorDict[
+                                                            task.status
+                                                        ]
+                                                    } text-white px-2 py-1 rounded-md text-sm`}>
+                                                    {task.status}
+                                                </span>
+                                            </p>
+                                            <p className="font-inter">
+                                                {taskData &&
+                                                    convertGMTToSGT(
+                                                        taskData[0].deadline!.toLocaleString()
+                                                    )}
+                                            </p>
+                                            <div className="w-full col-span-4">
+                                                <hr className="w-full border-[1px] border-grey" />
+                                            </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
                             {/* {userTasks.length > 5 ? (
                             <div className="flex justify-center items-center p-2">
                                 <button className="font-inter font-bold  text-blue underline hover:text-blue-600">
