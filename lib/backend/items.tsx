@@ -6,8 +6,11 @@ export async function getAllItems(jwt: string): Promise<{ items: Item[] }> {
     return call<{ items: Item[] }>('/items/all', 'GET', jwt);
 }
 
-export async function getItemById(jwt: string, id: string): Promise<Item> {
-    return call<Item>(`/items/${id}`, 'GET', jwt);
+export async function getItemById(
+    jwt: string,
+    id: string
+): Promise<{ item: Item }> {
+    return call<{ item: Item }>(`/items/${id}`, 'GET', jwt);
 }
 
 export async function addItem(

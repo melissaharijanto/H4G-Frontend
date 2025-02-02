@@ -5,33 +5,58 @@ import { buyItem, getItemById, preorderItem } from '@/lib/backend/items';
 import { getUser } from '@/lib/backend/users';
 import { setUser } from '@/lib/features/userSlice';
 import { useAppSelector, useAppStore } from '@/lib/hooks';
-import { Item } from '@/lib/types/Item';
 import { User } from '@/lib/types/User';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 const ProductPage = () => {
     const user: User = useAppSelector((state) => state.user);
     const session = useAppSelector((state) => state.session);
     const store = useAppStore();
+    const queryClient = useQueryClient();
 
     const [count, setCount] = useState<number>(0);
-    const [item, setItem] = useState<Item>();
-    const [disablePlusButton, setDisablePlusButton] = useState<boolean>(false);
-    const [disableMinusButton, setDisableMinusButton] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [currentUser, setCurrentUser] = useState<User>(user);
 
     const { id }: { id: string } = useParams();
 
-    const incrementCount = () => {
-        setCount((count) => count + 1);
-    };
+    const { data: item, isLoading } = useQuery({
+        queryKey: ['item', id],
+        queryFn: () => getItemById(session.jwt, id).then((data) => data.item),
+    });
 
-    const decrementCount = () => {
-        setCount((count) => count - 1);
-    };
+    const buyMutation = useMutation({
+        mutationFn: () => buyItem(session.jwt, user.user.uid, item!.id, count),
+        onSuccess: async () => {
+            setSuccessMessage('Transaction successful!');
+            await queryClient.invalidateQueries({
+                queryKey: ['item', id],
+            });
+            const updatedUser = await getUser(session.jwt, user.user.uid);
+            console.log(updatedUser);
+            store.dispatch(setUser(updatedUser));
+        },
+        onError: (error: any) => {
+            setErrorMessage(error.message || 'Transaction failed.');
+        },
+    });
+
+    const preorderMutation = useMutation({
+        mutationFn: () =>
+            preorderItem(session.jwt, user.user.uid, item!.id, count),
+        onSuccess: () => {
+            setSuccessMessage('Preorder successful!');
+            const updatedUser = getUser(session.jwt, user.user.uid).then(
+                (data) => data
+            );
+            store.dispatch(setUser(updatedUser));
+        },
+        onError: (error: any) => {
+            setErrorMessage(error.message || 'Preorder failed.');
+        },
+    });
 
     const handleBuyItem = () => {
         setSuccessMessage(null);
@@ -39,29 +64,8 @@ const ProductPage = () => {
         if (count <= 0) {
             setErrorMessage('Please buy or preorder at least 1 product.');
             return;
-        } else {
-            buyItem(session.jwt, user.user.uid, item!.id, count)
-                .then((data) => {
-                    if (!data.success) {
-                        setErrorMessage(data.message);
-                        return;
-                    } else {
-                        setSuccessMessage('Transaction successful!');
-                        getUser(session.jwt, user.user.uid!).then((data) => {
-                            store.dispatch(setUser(data));
-                        });
-                        setCurrentUser((prevState) => ({
-                            ...prevState!,
-                            credit: prevState.credit - count * item!.price, // Update the stock property
-                        }));
-                        setItem((prevState) => ({
-                            ...prevState!,
-                            stock: prevState!.stock - 1, // Update the stock property
-                        }));
-                    }
-                })
-                .catch((error) => console.log(error));
         }
+        buyMutation.mutate();
     };
 
     const handlePreorderItem = () => {
@@ -70,29 +74,11 @@ const ProductPage = () => {
         if (count <= 0) {
             setErrorMessage('Please buy or preorder at least 1 product.');
             return;
-        } else {
-            preorderItem(session.jwt, user.user.uid, item!.id, count).then(
-                (data) => console.log(data)
-            );
         }
+        preorderMutation.mutate();
     };
 
-    useEffect(() => {
-        getItemById(session.jwt, id).then((data) => {
-            console.log(data);
-            setItem(data.item);
-        });
-    }, []);
-
-    useEffect(() => {
-        setDisableMinusButton(false);
-        setDisablePlusButton(false);
-        if (count <= 0) {
-            setDisableMinusButton(true);
-        } else if (count >= (item?.stock || 100) && item!.stock > 0) {
-            setDisablePlusButton(true);
-        }
-    }, [count]);
+    if (isLoading) return <p>Loading...</p>;
 
     return (
         <ProtectedRoute>
@@ -127,43 +113,40 @@ const ProductPage = () => {
                             <div className="w-full text-lg">
                                 <div className="flex gap-x-4 items-center">
                                     <div className="flex border-2 border-dark-grey rounded-xl w-fit">
-                                        <div className=" border-r-2 border-dark-grey py-2 px-4">
+                                        <div className="border-r-2 border-dark-grey py-2 px-4">
                                             <button
-                                                onClick={decrementCount}
-                                                disabled={disableMinusButton}>
+                                                onClick={() =>
+                                                    setCount(count - 1)
+                                                }
+                                                disabled={count <= 0}
+                                                className="px-2 py-1 rounded-l-xl">
                                                 -
                                             </button>
                                         </div>
-                                        <div className="px-4 py-2 max-w-[8ch] flex">
+                                        <div className="px-2 py-1 max-w-[8ch] flex">
                                             <input
-                                                style={{
-                                                    MozAppearance: 'textfield', // Firefox
-                                                    WebkitAppearance: 'none', // Chrome, Safari
-                                                }}
                                                 className="focus:outline-none bg-off-white w-full text-center appearance-none"
                                                 value={count}
-                                                onChange={(e) => {
-                                                    if (
-                                                        parseInt(
-                                                            e.target.value
-                                                        ) < 0
-                                                    ) {
-                                                        setCount(count);
-                                                    } else {
-                                                        setCount(
+                                                onChange={(e) =>
+                                                    setCount(
+                                                        Math.max(
+                                                            0,
                                                             parseInt(
                                                                 e.target.value
                                                             ) || 0
-                                                        );
-                                                    }
-                                                }}
+                                                        )
+                                                    )
+                                                }
                                                 type="number"
                                             />
                                         </div>
-                                        <div className="border-l-2 border-dark-grey py-2 px-4">
+                                        <div className="border-l-2 border-dark-grey py-1 px-2">
                                             <button
-                                                onClick={incrementCount}
-                                                disabled={disablePlusButton}>
+                                                onClick={() =>
+                                                    setCount(count + 1)
+                                                }
+                                                disabled={count >= item!.stock}
+                                                className="px-4 py-2 rounded-r-xl">
                                                 +
                                             </button>
                                         </div>
